@@ -34,6 +34,8 @@ public:
   std::vector<DmpFeeNavig> GetFeeNavigator()const{return fFeeNavig;}
   short GetSignalSize()const{return fADC.size();}
   bool GetSignal(const short &index,short &gid,short &adc)const;
+  bool GetSignal(const short &index,short &l,short &b,short &s,short &d,short &adc)const;
+  bool GetSignal(const short &index,short &gid,short &l,short &b,short &s,short &d,short &adc)const;
 
 private:
   short fTrigger;

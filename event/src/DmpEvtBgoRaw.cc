@@ -1,5 +1,5 @@
 /*
- *  $Id: DmpEvtBgoRaw.cc, 2014-08-20 19:36:43 DAMPE $
+ *  $Id: DmpEvtBgoRaw.cc, 2014-09-11 16:35:39 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 24/04/2014
 */
@@ -8,6 +8,7 @@
 
 #include "DmpEvtBgoRaw.h"
 #include "DmpEFeeFlags.h"
+#include "DmpBgoBase.h"
 
 //-------------------------------------------------------------------
 DmpEvtBgoRaw::DmpEvtBgoRaw()
@@ -79,6 +80,33 @@ void DmpEvtBgoRaw::GenerateStatus(){
 bool DmpEvtBgoRaw::GetSignal(const short &index,short &gid,short&adc)const{
   if(index<fADC.size()){
     gid = fGlobalDynodeID[index];
+    adc = fADC[index];
+    return true;
+  }
+  return false;
+}
+
+//-------------------------------------------------------------------
+bool DmpEvtBgoRaw::GetSignal(const short &index,short &l,short &b,short &s,short &d,short&adc)const{
+  if(index<fADC.size()){
+    l = DmpBgoBase::GetLayerID(fGlobalDynodeID[index]);
+    b = DmpBgoBase::GetBarID(fGlobalDynodeID[index]);
+    s = DmpBgoBase::GetSideID(fGlobalDynodeID[index]);
+    d = DmpBgoBase::GetDynodeID(fGlobalDynodeID[index]);
+    adc = fADC[index];
+    return true;
+  }
+  return false;
+}
+
+//-------------------------------------------------------------------
+bool DmpEvtBgoRaw::GetSignal(const short &index,short &gid,short &l,short &b,short &s,short &d,short&adc)const{
+  if(index<fADC.size()){
+    gid = fGlobalDynodeID[index];
+    l = DmpBgoBase::GetLayerID(gid);
+    b = DmpBgoBase::GetBarID(gid);
+    s = DmpBgoBase::GetSideID(gid);
+    d = DmpBgoBase::GetDynodeID(gid);
     adc = fADC[index];
     return true;
   }
