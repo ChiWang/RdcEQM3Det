@@ -220,7 +220,7 @@ _FeeData::_FeeData(char *data,const short &bytes,const unsigned short &crc){
     Navigator.CRCFlag = false;
   }
   Navigator.PackageFlag = Signal[0];
-  Navigator.RunMode = Signal[1]>>6;
+  Navigator.RunMode = (Signal[1]>>6)&0x0003;    // 1100 0000
   Navigator.FeeID = Signal[1]&0x003f; // &0011 1111
   Signal.erase(Signal.begin(),Signal.begin()+4);    // NOTE: 1 byte pkgFlag, 1 byte runMode_feeID, 2 bytes for data length
   Navigator.Trigger = (short)(unsigned char)Signal[Signal.size()-1];

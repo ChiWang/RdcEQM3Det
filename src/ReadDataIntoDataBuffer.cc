@@ -28,10 +28,6 @@ bool DmpAlgRdcEQM::ReadDataIntoDataBuffer(){
   unsigned short packetID = 0;
   fFile.read((char*)(&packetID),2);
   packetID = htobe16(packetID) & 0x3fff;    // only bits 0~13
-  if((s_LastPkgID != -1) && (((packetID-1)&s_LastPkgID) != s_LastPkgID)){
-    DmpLogWarning<<"Scientific data package count not continuous...\tLast/Current: "<<s_LastPkgID<<"/"<<packetID<<DmpLogEndl;
-  }
-  s_LastPkgID = packetID;
   unsigned short dataLength = 0;
   fFile.read((char*)(&dataLength),2);
   dataLength = htobe16(dataLength);
@@ -42,6 +38,10 @@ bool DmpAlgRdcEQM::ReadDataIntoDataBuffer(){
   }
   _HeaderNavig *newEvt = new _HeaderNavig(dataLength,&time[2]);
   fHeaderBuf.insert(std::make_pair(fGoodRawEventID,newEvt));
+  if((s_LastPkgID != -1) && (((packetID-1)&s_LastPkgID) != s_LastPkgID)){
+    DmpLogWarning<<"Scientific data package count not continuous...\tLast/Current: "<<s_LastPkgID<<"/"<<packetID;  PrintTime();
+  }
+  s_LastPkgID = packetID;
   if(CheckE2250813DataLength(dataLength)){    // will find next 0xe2250813 as expected
     for(short i=0;i<s_TotalFeeNo;++i){
       unsigned short feeHeader = 0;
@@ -107,7 +107,6 @@ bool DmpAlgRdcEQM::ReadDataIntoDataBuffer(){
       }
     }
   }else{
-std::cout<<"xxDEBUG: "<<__FILE__<<"("<<__LINE__<<")\t"<<(int)fFile.tellg()<<std::endl;
     Exception(endOfLastHeader,"Data length error [0xe2250813]");
     return false;
   }
