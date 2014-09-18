@@ -19,6 +19,7 @@ bool DmpAlgRdcEQM::ReadDataIntoDataBuffer(){
   fFile.read((char*)(&scientificHeader),4);
   while(0xe2250813 != htobe32(scientificHeader)){
     if(fFile.tellg() == -1){
+      fFile.clear();
       return false;
     }
     fFile.seekg((int)fFile.tellg()-3,std::ios::beg);
@@ -34,6 +35,7 @@ bool DmpAlgRdcEQM::ReadDataIntoDataBuffer(){
   char time[8];
   fFile.read(time,8);
   if(fFile.tellg() == -1){  // data length right
+    fFile.clear();
     return false;
   }
   _HeaderNavig *newEvt = new _HeaderNavig(dataLength,&time[2]);
@@ -145,13 +147,16 @@ bool DmpAlgRdcEQM::CheckEb90DataLength(const int &n){
 //-------------------------------------------------------------------
 void DmpAlgRdcEQM::Exception(const int &endOfLastE2250813,const std::string &e){
   DmpLogError<<e<<"\tEvent ID: "<<gCore->GetCurrentEventID(); PrintTime();
+  fFile.clear();
   fFile.seekg(endOfLastE2250813,std::ios::beg);
   unsigned int scientificHeader = 0;         // 4 bytes 0xe225 0813
   fFile.read((char*)(&scientificHeader),4);
   while(0xe2250813 != htobe32(scientificHeader)){
     if(fFile.tellg() == -1){
-      fFile.seekg(0,std::ios::end);
-      break;
+      fFile.clear();
+      return;
+      //fFile.seekg(0,std::ios::end);
+      //break;
     }
     fFile.seekg((int)fFile.tellg()-3,std::ios::beg);
     fFile.read((char*)(&scientificHeader),4);

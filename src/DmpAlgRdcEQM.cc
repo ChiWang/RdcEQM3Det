@@ -22,6 +22,7 @@ DmpAlgRdcEQM::DmpAlgRdcEQM()
   OptMap.insert(std::make_pair("Psd/Connector", 4));
   OptMap.insert(std::make_pair("Stk/Connector", 5));
   OptMap.insert(std::make_pair("Nud/Connector", 7));
+  gRootIOSvc->Set("OutData/Key","rdc");
 }
 
 //-------------------------------------------------------------------
@@ -39,6 +40,7 @@ void DmpAlgRdcEQM::Set(const std::string &type, const std::string &argv){
     case 0: // BinaryFile
     {
       fInDataName = argv;
+      gRootIOSvc->Set("OutData/FileName",fInDataName.stem().string());
       break;
     }
     case 1: // Connector/Bgo
@@ -70,7 +72,6 @@ void DmpAlgRdcEQM::Set(const std::string &type, const std::string &argv){
 
 //-------------------------------------------------------------------
 bool DmpAlgRdcEQM::Initialize(){
-  gRootIOSvc->Set("OutData/FileName","./"+this->GetInputFileName()+"_raw.root");
   fFile.open(fInDataName.c_str(),std::ios::in|std::ios::binary);
   if(not fFile.good()){
     DmpLogError<<"Open "<<fInDataName<<" failed"<<DmpLogEndl;
