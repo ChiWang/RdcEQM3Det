@@ -77,7 +77,7 @@ bool DmpAlgRdcEQM::Initialize(){
     DmpLogError<<"Open "<<fInDataName<<" failed"<<DmpLogEndl;
     return false;
   }else{
-    std::string name = "Error_"+fInDataName.filename().string();
+    std::string name = gRootIOSvc->GetOutputPath()+"Error_"+fInDataName.filename().string();
     DmpLogInfo<<"Reading "<<fInDataName.string()<<".\tError data in "<<name<<DmpLogEndl;
     fOutError.open(name.c_str(),std::ios::out|std::ios::binary);
   }
@@ -95,7 +95,7 @@ bool DmpAlgRdcEQM::Initialize(){
 #include "DmpCore.h"
 bool DmpAlgRdcEQM::ProcessThisEvent(){
   while(fEventInBuf.size() == 0){
-    if(fFile.eof()){
+    if(fFile.eof() || (fFile.tellg() == -1)){
       DmpLogInfo<<"Reach the end of "<<fInDataName<<DmpLogEndl;
       gCore->TerminateRun();
       return false;
@@ -124,7 +124,7 @@ bool DmpAlgRdcEQM::ProcessThisEventHeader(const long &id){
   std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
     return false;
   }
-  fEvtHeader->SetEventID(gCore->GetCurrentEventID());
+  fEvtHeader->fEventID = gCore->GetCurrentEventID();
   fEvtHeader->SetTime(fHeaderBuf[id]->Time);
   return true;
 }

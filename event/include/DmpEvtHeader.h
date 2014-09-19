@@ -18,7 +18,6 @@ public:
   DmpEvtHeader():fEventID(-1),fSecond(-1),fMillisecond(-1){}
   ~DmpEvtHeader(){}
 
-  void  SetEventID(const long &v) {fEventID=v;}     // one good event
   void  SetTime(char *time){
     fSecond = 0;
     for(size_t i=0;i<4;++i){        // 4 bytes second
@@ -26,11 +25,8 @@ public:
     }
     fMillisecond = (short)(unsigned char)time[4]*256 + (short)(unsigned char)time[5];          // 2 bytes millisecond
   }
-  short GetEventID()const {return fEventID;}
-  int   GetSecond()const {return fSecond;}
-  short GetMillisecond()const {return fMillisecond;}
 
-private:
+public:
   short     fEventID;           // good event
   int       fSecond;            // time second
   short     fMillisecond;       // time millisecond

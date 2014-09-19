@@ -14,14 +14,16 @@ import libDmpRdcEQM as RdcEQM
 
 #-------------------------------------------------------------------
 # Global setting
-#DMPSW.Core.Set("EventNumber","305")     # If NOT set, will use 1234567890
+#DMPSW.Core.Set("EventNumber","305")     # If NOT set
 #DMPSW.Core.Set("StartTime","20130101-0000")     # if NOT set, start from launch time
 #DMPSW.Core.Set("StopTime","20160101-0000")      # if NOT set, end at 2113.01.01
 #DMPSW.Core.Set("LogLevel","Debug")      # Value = {Error | Warning | Info | Debug}. If NOT set, will use Info.
+#DMPSW.Core.Set("LogHeader","On")
 
 #-------------------------------------------------------------------
 # RootIOSvc Service
 DMPSW.RootIOSvc.Set("OutData/WriteList","Event/Rdc/EventHeader;Event/Rdc/Bgo")  # split by ;
+#DMPSW.RootIOSvc.Set("OutData/Path","./Rdc2/xx")
 
 #-------------------------------------------------------------------
 # Creat user's service or algorithm
@@ -30,9 +32,7 @@ rdcAlgBT = RdcEQM.DmpAlgRdcEQM()
 #rdcAlgBT.Set("Stk/Connector",Stk/EQM")
 rdcAlgBT.Set("Bgo/Connector","Bgo/EQM")
 #rdcAlgBT.Set("Nud/Connector","Nud/EQM")
-rdcAlgBT.Set("BinaryFile","A2Data00_20140513-191731.frd")
-#DMPSW.RootIOSvc.Set("OutData/FileName","./test/DmpRdcData1.root")        # if NOT set, will use input name
-#rdcAlgBT.Set("BinaryFile","test_A2Data00_20140513-191731.frd")
+rdcAlgBT.Set("BinaryFile","A2_20140912_092040.frd")
 
 #-------------------------------------------------------------------
 # Append user's service or algorithm into Kernel

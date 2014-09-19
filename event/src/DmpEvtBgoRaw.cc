@@ -8,7 +8,6 @@
 
 #include "DmpEvtBgoRaw.h"
 #include "DmpEFeeFlags.h"
-#include "DmpBgoBase.h"
 
 //-------------------------------------------------------------------
 DmpEvtBgoRaw::DmpEvtBgoRaw()
@@ -30,15 +29,13 @@ void DmpEvtBgoRaw::Reset(){
 
 //-------------------------------------------------------------------
 void DmpEvtBgoRaw::AppendSignal(const short &gid,const short &v){
-  short n= fGlobalDynodeID.size();
-  /*
-  for(size_t i=0;i<n;++i){
-    if(gid == fGlobalDynodeID[i]){
-      std::cout<<"Error: exist this gid"<<std::endl;
-      return;
-    }
-  }
-  */
+  //short n= fGlobalDynodeID.size();
+  //for(size_t i=0;i<n;++i){
+  //  if(gid == fGlobalDynodeID[i]){
+  //    std::cout<<"Error: exist this gid"<<std::endl;
+  //    return;
+  //  }
+  //}
   fGlobalDynodeID.push_back(gid);
   fADC.push_back(v);
 }
@@ -77,6 +74,7 @@ void DmpEvtBgoRaw::GenerateStatus(){
 }
 
 //-------------------------------------------------------------------
+/*
 bool DmpEvtBgoRaw::GetSignal(const short &index,short &gid,short&adc)const{
   if(index<fADC.size()){
     gid = fGlobalDynodeID[index];
@@ -112,4 +110,4 @@ bool DmpEvtBgoRaw::GetSignal(const short &index,short &gid,short &l,short &b,sho
   }
   return false;
 }
-
+*/

@@ -28,16 +28,7 @@ public:
   void  AppendSignal(const short &gid,const short &v);
   void  GenerateStatus();
 
-  bool  IsGoodEvent()const{return fIsGood;}
-  short GetTrigger()const{return fTrigger;}
-  short GetRunMode()const{return fRunMode;}
-  std::vector<DmpFeeNavig> GetFeeNavigator()const{return fFeeNavig;}
-  short GetSignalSize()const{return fADC.size();}
-  bool GetSignal(const short &index,short &gid,short &adc)const;
-  bool GetSignal(const short &index,short &l,short &b,short &s,short &d,short &adc)const;
-  bool GetSignal(const short &index,short &gid,short &l,short &b,short &s,short &d,short &adc)const;
-
-private:
+public:
   short fTrigger;
   short fRunMode;
   bool  fIsGood;
