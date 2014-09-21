@@ -11,18 +11,17 @@
 
 //-------------------------------------------------------------------
 DmpAlgRdcEQM::DmpAlgRdcEQM()
- :DmpVAlg("Rdc/EQM"),fInDataName("NO"),fGoodRawEventID(0),fEvtHeader(0),
+ :DmpVAlg("Rdc/EQM"),fGoodRawEventID(0),fEvtHeader(0),
   fCNCTPathBgo("NO"),fEvtBgo(0),
   fCNCTPathPsd("NO"),fEvtPsd(0),
   fCNCTPathNud("NO"),fEvtNud(0)
   //fCNCTPathStk("NO"),fEvtStk(0)
 {
-  OptMap.insert(std::make_pair("BinaryFile",    0));
   OptMap.insert(std::make_pair("Bgo/Connector", 1));
   OptMap.insert(std::make_pair("Psd/Connector", 4));
   OptMap.insert(std::make_pair("Stk/Connector", 5));
   OptMap.insert(std::make_pair("Nud/Connector", 7));
-  gRootIOSvc->Set("OutData/Key","raw0");
+  gRootIOSvc->Set("Output/Key","raw0");
 }
 
 //-------------------------------------------------------------------
@@ -37,15 +36,6 @@ void DmpAlgRdcEQM::Set(const std::string &type, const std::string &argv){
   std::string prefix = (std::string)getenv("DMPSWWORK")+"/share/Connector/";
   //std::string prefix = (std::string)getenv("DMPSWSYS")+"/share/Connector/";
   switch (OptMap[type]){
-    case 0: // BinaryFile
-    {
-      boost::filesystem::path temp(argv);
-      if(temp.parent_path().string() == ""){
-        fInDataName = gRootIOSvc->GetInputPath()+argv;
-      }
-      gRootIOSvc->Set("OutData/FileName",fInDataName.stem().string());
-      break;
-    }
     case 1: // Connector/Bgo
     {
       fCNCTPathBgo = prefix+argv;
@@ -75,13 +65,12 @@ void DmpAlgRdcEQM::Set(const std::string &type, const std::string &argv){
 
 //-------------------------------------------------------------------
 bool DmpAlgRdcEQM::Initialize(){
-  fFile.open(fInDataName.c_str(),std::ios::in|std::ios::binary);
+  fFile.open(gRootIOSvc->GetInputFileName().c_str(),std::ios::in|std::ios::binary);
   if(not fFile.good()){
-    DmpLogError<<"Open "<<fInDataName<<" failed"<<DmpLogEndl;
+    DmpLogError<<"Open "<<gRootIOSvc->GetInputFileName()<<" failed"<<DmpLogEndl;
     return false;
   }else{
-    std::string name = gRootIOSvc->GetOutputPath()+"Error_"+fInDataName.filename().string();
-    DmpLogInfo<<"Reading "<<fInDataName.string()<<".\tError data in "<<name<<DmpLogEndl;
+    std::string name = gRootIOSvc->GetOutputPath()+gRootIOSvc->GetOutputStem()+".error";
     fOutError.open(name.c_str(),std::ios::out|std::ios::binary);
   }
   fEvtHeader = new DmpEvtHeader();
@@ -99,7 +88,7 @@ bool DmpAlgRdcEQM::Initialize(){
 bool DmpAlgRdcEQM::ProcessThisEvent(){
   while(fEventInBuf.size() == 0){
     if(fFile.eof() || (fFile.tellg() == -1)){
-      DmpLogInfo<<"Reach the end of "<<fInDataName<<DmpLogEndl;
+      DmpLogInfo<<"Reach the end of "<<gRootIOSvc->GetInputFileName()<<DmpLogEndl;
       gCore->TerminateRun();
       return false;
     }

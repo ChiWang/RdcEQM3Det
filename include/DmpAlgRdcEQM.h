@@ -7,7 +7,6 @@
 #ifndef DmpAlgRdcEQM_H
 #define DmpAlgRdcEQM_H
 
-#include <boost/filesystem.hpp>     // path
 #include <fstream>
 
 #include "DmpFeeNavig.h"
@@ -60,10 +59,6 @@ public:
   bool ProcessThisEvent();
   bool Finalize();
 
-public:
-  std::string GetInputFileName()const{return fInDataName.filename().string();}
-  std::string GetInputPath()const{return fInDataName.stem().string();}
-
 private:    // for all
   bool ReadDataIntoDataBuffer();    // read one e2250813
   std::vector<long> fEventInBuf;    // Event ID: Event in Buffer
@@ -79,7 +74,6 @@ private:    // for all
   void Exception(const int &b,const std::string &e);     // throw whole data of e2250813 into fOutError
   void EraseBuffer(const long &id);
 
-  boost::filesystem::path   fInDataName;    // input data name
   long              fGoodRawEventID;    // good event id, find from raw data(one e2250813 or many e2250813)
   std::ifstream     fFile;          // in data stream
   std::ofstream     fOutError;      // save error datas into Error_fInDataName
