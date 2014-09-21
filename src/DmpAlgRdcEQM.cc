@@ -1,5 +1,5 @@
 /*
- *  $Id: DmpAlgRdcEQM.cc, 2014-08-31 22:46:23 DAMPE $
+ *  $Id: DmpAlgRdcEQM.cc, 2014-09-21 17:23:33 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 27/05/2014
 */
@@ -70,7 +70,7 @@ bool DmpAlgRdcEQM::Initialize(){
     DmpLogError<<"Open "<<gRootIOSvc->GetInputFileName()<<" failed"<<DmpLogEndl;
     return false;
   }else{
-    std::string name = gRootIOSvc->GetOutputPath()+gRootIOSvc->GetOutputStem()+".error";
+    std::string name = gRootIOSvc->GetOutputPath()+gRootIOSvc->GetInputStem()+".error";
     fOutError.open(name.c_str(),std::ios::out|std::ios::binary);
   }
   fEvtHeader = new DmpEvtHeader();
