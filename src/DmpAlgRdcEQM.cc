@@ -21,7 +21,7 @@ DmpAlgRdcEQM::DmpAlgRdcEQM()
   OptMap.insert(std::make_pair("Psd/Connector", 4));
   OptMap.insert(std::make_pair("Stk/Connector", 5));
   OptMap.insert(std::make_pair("Nud/Connector", 7));
-  gRootIOSvc->Set("Output/Key","raw0");
+  //gRootIOSvc->Set("Output/Key","rdc");
 }
 
 //-------------------------------------------------------------------
