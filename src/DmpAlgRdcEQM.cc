@@ -22,7 +22,7 @@ DmpAlgRdcEQM::DmpAlgRdcEQM()
   OptMap.insert(std::make_pair("Psd/Connector", 4));
   OptMap.insert(std::make_pair("Stk/Connector", 5));
   OptMap.insert(std::make_pair("Nud/Connector", 7));
-  gRootIOSvc->Set("OutData/Key","rdc");
+  gRootIOSvc->Set("OutData/Key","raw0");
 }
 
 //-------------------------------------------------------------------
@@ -39,7 +39,10 @@ void DmpAlgRdcEQM::Set(const std::string &type, const std::string &argv){
   switch (OptMap[type]){
     case 0: // BinaryFile
     {
-      fInDataName = argv;
+      boost::filesystem::path temp(argv);
+      if(temp.parent_path().string() == ""){
+        fInDataName = gRootIOSvc->GetInputPath()+argv;
+      }
       gRootIOSvc->Set("OutData/FileName",fInDataName.stem().string());
       break;
     }
