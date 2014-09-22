@@ -7,18 +7,18 @@
 
 #include "DmpEvtPsdRaw.h"
 #include "DmpDataBuffer.h"
-#include "DmpAlgRdcEQM.h"
+#include "DmpAlgHex2Root.h"
 #include "DmpParameterPsd.h"
 
 //-------------------------------------------------------------------
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
-bool DmpAlgRdcEQM::InitializePsd(){
+bool DmpAlgHex2Root::InitializePsd(){
   return true;
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::ProcessThisEventPsd(const long &id){
+bool DmpAlgHex2Root::ProcessThisEventPsd(const long &id){
   if(fPsdBuf.find(id) == fPsdBuf.end()){
   std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
     return false;

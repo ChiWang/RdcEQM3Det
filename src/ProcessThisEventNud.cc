@@ -7,18 +7,18 @@
 
 #include "DmpEvtNudRaw.h"
 #include "DmpDataBuffer.h"
-#include "DmpAlgRdcEQM.h"
+#include "DmpAlgHex2Root.h"
 #include "DmpParameterNud.h"
 
 //-------------------------------------------------------------------
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
-bool DmpAlgRdcEQM::InitializeNud(){
+bool DmpAlgHex2Root::InitializeNud(){
   return true;
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::ProcessThisEventNud(const long &id){
+bool DmpAlgHex2Root::ProcessThisEventNud(const long &id){
   if(fNudBuf.find(id) == fNudBuf.end()){
   std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
     return false;

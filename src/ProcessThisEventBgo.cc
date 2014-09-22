@@ -7,14 +7,14 @@
 
 #include "DmpEvtBgoRaw.h"
 #include "DmpDataBuffer.h"
-#include "DmpAlgRdcEQM.h"
+#include "DmpAlgHex2Root.h"
 #include "DmpBgoBase.h"
 #include "DmpParameterBgo.h"
 
 //-------------------------------------------------------------------
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
-bool DmpAlgRdcEQM::InitializeBgo(){
+bool DmpAlgHex2Root::InitializeBgo(){
   if(fCNCTPathBgo == "NO"){
     DmpLogInfo<<"No set connector:\tBgo"<<DmpLogEndl;
     return true;
@@ -54,7 +54,7 @@ bool DmpAlgRdcEQM::InitializeBgo(){
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::ProcessThisEventBgo(const long &id){
+bool DmpAlgHex2Root::ProcessThisEventBgo(const long &id){
   if(fBgoBuf.find(id) == fBgoBuf.end()){
   std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
     return false;

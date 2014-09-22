@@ -1,5 +1,5 @@
 /*
- *  $Id: DmpAlgRdcEQM.cc, 2014-09-21 17:23:33 DAMPE $
+ *  $Id: DmpAlgHex2Root.cc, 2014-09-22 16:55:31 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 27/05/2014
 */
@@ -7,10 +7,10 @@
 #include <stdlib.h>     // getenv()
 #include "DmpEvtHeader.h"
 #include "DmpDataBuffer.h"
-#include "DmpAlgRdcEQM.h"
+#include "DmpAlgHex2Root.h"
 
 //-------------------------------------------------------------------
-DmpAlgRdcEQM::DmpAlgRdcEQM()
+DmpAlgHex2Root::DmpAlgHex2Root()
  :DmpVAlg("Rdc/EQM"),fGoodRawEventID(0),fEvtHeader(0),
   fCNCTPathBgo("NO"),fEvtBgo(0),
   fCNCTPathPsd("NO"),fEvtPsd(0),
@@ -25,11 +25,11 @@ DmpAlgRdcEQM::DmpAlgRdcEQM()
 }
 
 //-------------------------------------------------------------------
-DmpAlgRdcEQM::~DmpAlgRdcEQM(){
+DmpAlgHex2Root::~DmpAlgHex2Root(){
 }
 
 //-------------------------------------------------------------------
-void DmpAlgRdcEQM::Set(const std::string &type, const std::string &argv){
+void DmpAlgHex2Root::Set(const std::string &type, const std::string &argv){
 // *
 // *  TODO: if release, use DMPSWSYS
 // *
@@ -64,7 +64,7 @@ void DmpAlgRdcEQM::Set(const std::string &type, const std::string &argv){
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::Initialize(){
+bool DmpAlgHex2Root::Initialize(){
   fFile.open(gRootIOSvc->GetInputFileName().c_str(),std::ios::in|std::ios::binary);
   if(not fFile.good()){
     DmpLogError<<"Open "<<gRootIOSvc->GetInputFileName()<<" failed"<<DmpLogEndl;
@@ -85,7 +85,7 @@ bool DmpAlgRdcEQM::Initialize(){
 
 //-------------------------------------------------------------------
 #include "DmpCore.h"
-bool DmpAlgRdcEQM::ProcessThisEvent(){
+bool DmpAlgHex2Root::ProcessThisEvent(){
   while(fEventInBuf.size() == 0){
     if(fFile.eof() || (fFile.tellg() == -1)){
       DmpLogInfo<<"Reach the end of "<<gRootIOSvc->GetInputFileName()<<DmpLogEndl;
@@ -104,14 +104,14 @@ bool DmpAlgRdcEQM::ProcessThisEvent(){
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::Finalize(){
+bool DmpAlgHex2Root::Finalize(){
   fFile.close();
   fOutError.close();
   return true;
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::ProcessThisEventHeader(const long &id){
+bool DmpAlgHex2Root::ProcessThisEventHeader(const long &id){
   if(fHeaderBuf.find(id) == fHeaderBuf.end()){
   std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
     return false;
@@ -122,7 +122,7 @@ bool DmpAlgRdcEQM::ProcessThisEventHeader(const long &id){
 }
 
 //-------------------------------------------------------------------
-void DmpAlgRdcEQM::PrintTime()const{
+void DmpAlgHex2Root::PrintTime()const{
   std::cout<<"\t\tTime:";
   for(size_t i=0;i<6;++i){
     std::cout<<std::hex<<"  "<<(short)(unsigned char)(--fHeaderBuf.end())->second->Time[i];
@@ -131,7 +131,7 @@ void DmpAlgRdcEQM::PrintTime()const{
 }
 
 //-------------------------------------------------------------------
-void DmpAlgRdcEQM::EraseBuffer(const long &id){
+void DmpAlgHex2Root::EraseBuffer(const long &id){
   if(fHeaderBuf.find(id) != fHeaderBuf.end()){
     delete fHeaderBuf[id];
     fHeaderBuf.erase(id);

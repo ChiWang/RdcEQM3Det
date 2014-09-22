@@ -1,5 +1,5 @@
 '''
- *  $Id: SConstruct, 2014-08-12 18:40:59 DAMPE $
+ *  $Id: SConstruct, 2014-09-22 16:38:14 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 23/09/2013
  *----------------------------------------------------------
@@ -11,7 +11,7 @@
 
 import os
 
-target='DmpRdcEQM'
+target='DmpHex2Root'
 
 print "---> compiling: %s\n" % target
 #--------------------------------------------------------------------

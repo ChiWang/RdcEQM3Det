@@ -4,7 +4,7 @@
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 08/08/2014
 */
 
-#include "DmpAlgRdcEQM.h"
+#include "DmpAlgHex2Root.h"
 #include "DmpEDetectorID.h"
 #include "DmpCore.h"
 #include "DmpParameterBgo.h"
@@ -12,7 +12,7 @@
 #include "DmpParameterNud.h"
 #include "DmpParameterStk.h"
 
-bool DmpAlgRdcEQM::ReadDataIntoDataBuffer(){
+bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
   static short s_LastPkgID = -1, s_LastFeeTrg = -1, s_CurrentFeeTrg = 0;
   static short s_TotalFeeNo = DmpParameterBgo::kFeeNo+DmpParameterNud::kFeeNo+DmpParameterPsd::kFeeNo+DmpParameterStk::kTrbNo;
   unsigned int scientificHeader = 0;         // 4 bytes 0xe225 0813
@@ -117,7 +117,7 @@ bool DmpAlgRdcEQM::ReadDataIntoDataBuffer(){
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::CheckE2250813DataLength(const int &n){
+bool DmpAlgHex2Root::CheckE2250813DataLength(const int &n){
   int skipPoint = fFile.tellg();
   fFile.seekg(skipPoint+n+1-8,std::ios::beg);   // time: 8 bytes. need 1
   unsigned int scientificHeader = 0;            // 4 bytes 0xe225 0813
@@ -130,7 +130,7 @@ bool DmpAlgRdcEQM::CheckE2250813DataLength(const int &n){
 }
 
 //-------------------------------------------------------------------
-bool DmpAlgRdcEQM::CheckEb90DataLength(const int &n){
+bool DmpAlgHex2Root::CheckEb90DataLength(const int &n){
   int skipPoint = fFile.tellg();
   fFile.seekg(skipPoint+n-2,std::ios::beg);   // NOTE:  n include 2 bytes which is data length
   unsigned short header = 0;         // 4 bytes 0xe225 0813
@@ -143,7 +143,7 @@ bool DmpAlgRdcEQM::CheckEb90DataLength(const int &n){
 }
 
 //-------------------------------------------------------------------
-void DmpAlgRdcEQM::Exception(const int &endOfLastE2250813,const std::string &e){
+void DmpAlgHex2Root::Exception(const int &endOfLastE2250813,const std::string &e){
   DmpLogError<<e<<"\tEvent ID: "<<gCore->GetCurrentEventID(); PrintTime();
   fFile.seekg(endOfLastE2250813,std::ios::beg);
   unsigned int scientificHeader = 0;         // 4 bytes 0xe225 0813

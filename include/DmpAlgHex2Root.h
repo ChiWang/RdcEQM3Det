@@ -1,11 +1,11 @@
 /*
- *  $Id: DmpAlgRdcEQM.h, 2014-08-31 22:46:15 DAMPE $
+ *  $Id: DmpAlgHex2Root.h, 2014-09-22 16:54:03 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 27/05/2014
 */
 
-#ifndef DmpAlgRdcEQM_H
-#define DmpAlgRdcEQM_H
+#ifndef DmpAlgHex2Root_H
+#define DmpAlgHex2Root_H
 
 #include <fstream>
 
@@ -45,14 +45,14 @@ class DmpEvtPsdRaw;
 class DmpEvtNudRaw;
 class DmpEvtHeader;
 
-class DmpAlgRdcEQM : public DmpVAlg{
+class DmpAlgHex2Root : public DmpVAlg{
 /*
- *  DmpAlgRdcEQM
+ *  DmpAlgHex2Root
  *
  */
 public:
-  DmpAlgRdcEQM();
-  ~DmpAlgRdcEQM();
+  DmpAlgHex2Root();
+  ~DmpAlgHex2Root();
 
   void Set(const std::string&,const std::string&);
   bool Initialize();
