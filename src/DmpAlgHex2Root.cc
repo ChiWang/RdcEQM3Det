@@ -11,7 +11,7 @@
 
 //-------------------------------------------------------------------
 DmpAlgHex2Root::DmpAlgHex2Root()
- :DmpVAlg("Rdc/EQM"),fGoodRawEventID(0),fEvtHeader(0),
+ :DmpVAlg("Rdc/Hex2Root/EQM"),fGoodRawEventID(0),fEvtHeader(0),
   fCNCTPathBgo("NO"),fEvtBgo(0),
   fCNCTPathPsd("NO"),fEvtPsd(0),
   fCNCTPathNud("NO"),fEvtNud(0)

@@ -17,6 +17,11 @@ class DmpEvtHeader : public TObject{
 public:
   DmpEvtHeader():fEventID(-1),fSecond(-1),fMillisecond(-1){}
   ~DmpEvtHeader(){}
+  DmpEvtHeader &operator=(const DmpEvtHeader &r){
+    fEventID = r.fEventID;
+    fSecond = r.fSecond;
+    fMillisecond = r.fMillisecond;
+  }
 
   void  SetTime(char *time){
     fSecond = 0;

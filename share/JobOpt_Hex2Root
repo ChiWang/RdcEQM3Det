@@ -25,8 +25,8 @@ DMPSW.Core.Set("LogLevel","Error")      # Value = {Error | Warning | Info | Debu
 # RootIOSvc Service
 DMPSW.RootIOSvc.Set("Input/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
 DMPSW.RootIOSvc.Set("Input/FileName","A2_20140912_093933.frd")
-#DMPSW.RootIOSvc.Set("Output/Path","./test")
-DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
+DMPSW.RootIOSvc.Set("Output/Path","./test")
+#DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
 DMPSW.RootIOSvc.Set("Output/WriteList","Event/Rdc/EventHeader;Event/Rdc/Bgo")  # split by ;
 
 #-------------------------------------------------------------------
