@@ -46,7 +46,7 @@ public:
    *    dynode(2,5,8):  bits 3,2,1,0
    *        = fGlobal & 0x000f
    */
-  std::vector<float>    fADC;
+  std::vector<double>    fADC;
 
   ClassDef(DmpEvtBgoRaw,1)
 };
