@@ -18,24 +18,24 @@ import libDmpHex2Root as Hex2Root
 #DMPSW.Core.Set("EventNumber","4130")     # If NOT set, will use 1234567890
 #DMPSW.Core.Set("StartTime","20130101-0000")     # if NOT set, start from launch time
 #DMPSW.Core.Set("StopTime","20160101-0000")      # if NOT set, end at 2113.01.01
-DMPSW.Core.Set("LogLevel","Error")      # Value = {Error | Warning | Info | Debug}. If NOT set, will use Info.
+#DMPSW.Core.Set("LogLevel","Error")      # Value = {Error | Warning | Info | Debug}. If NOT set, will use Info.
 #DMPSW.Core.Set("LogHeader","On")
 
 #-------------------------------------------------------------------
 # RootIOSvc Service
 DMPSW.RootIOSvc.Set("Input/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
 DMPSW.RootIOSvc.Set("Input/FileName","A2_20140912_093933.frd")
-#DMPSW.RootIOSvc.Set("Output/Path","./test")
+DMPSW.RootIOSvc.Set("Output/Path","./test")
 #DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
 DMPSW.RootIOSvc.Set("Output/WriteList","Event/Rdc/EventHeader;Event/Rdc/Bgo")  # split by ;
 
 #-------------------------------------------------------------------
 # Creat user's service or algorithm
 rdcAlgBT = Hex2Root.DmpAlgHex2Root()
-#rdcAlgBT.Set("Psd/Connector","Psd/EQM")
-#rdcAlgBT.Set("Stk/Connector",Stk/EQM")
-rdcAlgBT.Set("Bgo/Connector","Bgo/EQM")
-#rdcAlgBT.Set("Nud/Connector","Nud/EQM")
+#rdcAlgBT.Set("Connector/Psd","Psd/EQM")
+#rdcAlgBT.Set("Connector/Stk",Stk/EQM")
+rdcAlgBT.Set("Connector/Bgo","Bgo/EQM")
+#rdcAlgBT.Set("Connector/Nud","Nud/EQM")
 #rdcAlgBT.Set("BinaryFile","A2_20140910_123726.frd")
 #rdcAlgBT.Set("BinaryFile","A2_20140912_092040.frd")
 #rdcAlgBT.Set("BinaryFile","A2_20140910_124351.frd")

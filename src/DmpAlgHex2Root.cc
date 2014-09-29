@@ -17,10 +17,10 @@ DmpAlgHex2Root::DmpAlgHex2Root()
   fCNCTPathNud("NO"),fEvtNud(0)
   //fCNCTPathStk("NO"),fEvtStk(0)
 {
-  OptMap.insert(std::make_pair("Bgo/Connector", 1));
-  OptMap.insert(std::make_pair("Psd/Connector", 4));
-  OptMap.insert(std::make_pair("Stk/Connector", 5));
-  OptMap.insert(std::make_pair("Nud/Connector", 7));
+  OptMap.insert(std::make_pair("Connector/Bgo", 1));
+  OptMap.insert(std::make_pair("Connector/Psd", 4));
+  OptMap.insert(std::make_pair("Connector/Stk", 5));
+  OptMap.insert(std::make_pair("Connector/Nud", 7));
   //gRootIOSvc->Set("Output/Key","rdc");
 }
 
@@ -30,6 +30,14 @@ DmpAlgHex2Root::~DmpAlgHex2Root(){
 
 //-------------------------------------------------------------------
 void DmpAlgHex2Root::Set(const std::string &type, const std::string &argv){
+  if(OptMap.find(type) == OptMap.end()){
+    DmpLogError<<"[DmpAlgHex2Root::Set] No argument type: "<<type<<DmpLogEndl;
+    DmpLogCout<<"\tPossible options are:"<<DmpLogEndl;
+    for(std::map<std::string,short>::iterator anOpt= OptMap.begin();anOpt!=OptMap.end();anOpt++){
+      DmpLogCout<<"\t\t"<<anOpt->first<<DmpLogEndl;
+    }
+    throw;
+  }
 // *
 // *  TODO: if release, use DMPSWSYS
 // *
@@ -41,24 +49,20 @@ void DmpAlgHex2Root::Set(const std::string &type, const std::string &argv){
       fCNCTPathBgo = prefix+argv;
       break;
     }
-    case 4:
-    {// Psd/Connector
+    case 4: // Connector/Psd
+    {
       fCNCTPathPsd = prefix+argv;
       break;
     }
-    case 5:
-    {// Stk/Connector
+    case 5: // Connector/Stk
+    {
       //fCNCTPathStk = prefix+argv;
       break;
     }
-    case 7:
-    {// Nud/Connector
+    case 7: // Connector/Nud
+    {
       fCNCTPathNud = prefix+argv;
       break;
-    }
-    default:
-    {
-      DmpLogWarning<<"No argument type: "<<type<<DmpLogEndl;
     }
   }
 }
@@ -123,11 +127,11 @@ bool DmpAlgHex2Root::ProcessThisEventHeader(const long &id){
 
 //-------------------------------------------------------------------
 void DmpAlgHex2Root::PrintTime()const{
-  std::cout<<"\t\tTime:";
+  DmpLogCout<<"\t\tTime:";
   for(size_t i=0;i<6;++i){
-    std::cout<<std::hex<<"  "<<(short)(unsigned char)(--fHeaderBuf.end())->second->Time[i];
+    DmpLogCout<<std::hex<<(short)(unsigned char)(--fHeaderBuf.end())->second->Time[i];
   }
-  std::cout<<std::dec<<std::endl;
+  DmpLogCout<<std::dec<<DmpLogEndl;
 }
 
 //-------------------------------------------------------------------
