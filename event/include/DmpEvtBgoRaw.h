@@ -1,5 +1,5 @@
 /*
- *  $Id: DmpEvtBgoRaw.h, 2014-08-22 17:45:40 DAMPE $
+ *  $Id: DmpEvtBgoRaw.h, 2014-10-09 21:39:18 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 24/04/2014
 */
@@ -7,7 +7,7 @@
 #ifndef DmpEvtBgoRaw_H
 #define DmpEvtBgoRaw_H
 
-#include <vector>
+#include <map>
 #include "DmpFeeNavig.h"
 
 //-------------------------------------------------------------------
@@ -23,30 +23,18 @@ class DmpEvtBgoRaw : public TObject{
 public:
   DmpEvtBgoRaw();
   ~DmpEvtBgoRaw();
+  DmpEvtBgoRaw &operator=(const DmpEvtBgoRaw &r);
   void  Reset();
-  void  SetFeeNavigator(const DmpFeeNavig &s){fFeeNavig.push_back(s);}
-  void  AppendSignal(const short &gid,const short &v);
-  void  GenerateStatus();
+  void  LoadFrom(const DmpEvtBgoRaw &r);
+  void  LoadFrom(const DmpEvtBgoRaw *&r);
 
 public:
-  short fTrigger;
-  short fRunMode;
-  bool  fIsGood;
+  DmpERunMode::Type GetRunMode(const short &i=99)const;
+  short GetTrigger(const short &i=99)const;
+
+public:
   std::vector<DmpFeeNavig>  fFeeNavig;
-  std::vector<short>    fGlobalDynodeID;
-  /*
-   *    short: bit 15~0
-   *
-   *    layer(0~13):    bits 14,13,12,11
-   *        = (fGlobalDynodeID >> 11) & 0x000f
-   *    bar(0~23):      bits 10,9,8,7,6
-   *         = (fGlobalDynodeID >> 6) & 0x001f
-   *    side(0,1):      bits 4
-   *        = (fGlobal >> 4) & 0x0001
-   *    dynode(2,5,8):  bits 3,2,1,0
-   *        = fGlobal & 0x000f
-   */
-  std::vector<double>    fADC;
+  std::map<short,double>    fADC;      // key is global dynode ID, value is adc count
 
   ClassDef(DmpEvtBgoRaw,1)
 };

@@ -8,8 +8,10 @@
 #define DmpAlgHex2Root_H
 
 #include <fstream>
+#include <map>
 
 #include "DmpFeeNavig.h"
+#include "DmpEvtPsdRaw.h"
 #include "DmpVAlg.h"
 
 //-------------------------------------------------------------------
@@ -40,10 +42,9 @@ struct _FeeData{
 };
 
 //-------------------------------------------------------------------
-class DmpEvtBgoRaw;
-class DmpEvtPsdRaw;
 class DmpEvtNudRaw;
 class DmpEvtHeader;
+class DmpMetadata;
 
 class DmpAlgHex2Root : public DmpVAlg{
 /*
@@ -83,33 +84,30 @@ private:    // for all
   std::map<long,_FeeData*>      fNudBuf;
 
 private:
+  DmpMetadata       *fMetadata;     // metadata of simulation
   DmpEvtHeader      *fEvtHeader;    // save me
   bool ProcessThisEventHeader(const long &id);    // convert event header
   void PrintTime()const;
 
 private:    // Bgo
-  std::string       fCNCTPathBgo;   // connector path
-  std::map<short,short> fMapBgo;    // map of Bgo connector
-
   DmpEvtBgoRaw      *fEvtBgo;       // Bgo outdata
+  std::map<short,short> fMapBgo;    // map of Bgo connector
   bool InitializeBgo();
   bool ProcessThisEventBgo(const long &id);
+  void CheckFeeFlag_Bgo();
 
 private:    // Psd
-  std::string       fCNCTPathPsd;   // connector path
-  std::map<short,short> fMapPsd;    // map of Psd connector
-
   DmpEvtPsdRaw      *fEvtPsd;       // Psd outdata
+  std::map<short,short> fMapPsd;    // map of Psd connector
   bool InitializePsd();
   bool ProcessThisEventPsd(const long &id);
+  void CheckFeeFlag_Psd();
 
 private:    // Nud
-  std::string       fCNCTPathNud;   // connector path
-  std::map<short,short> fMapNud;    // map of Nud connector
-
   DmpEvtNudRaw      *fEvtNud;       // Nud outdata
   bool InitializeNud();
   bool ProcessThisEventNud(const long &id);
+  void CheckFeeFlag_Nud();
 };
 
 #endif

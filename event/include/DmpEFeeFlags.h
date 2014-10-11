@@ -10,22 +10,23 @@
 //-------------------------------------------------------------------
 namespace DmpEPackageFlag{
   enum Type{
-    kPowerOk = 0x80,        // bit 7 = 1, power not resetted. VA locked then power reset
-    kHThresholdOk = 0x40,   // bit 6 = 1, high threshold ok
-    kLThresholdOk = 0x20,   // bit 5 = 1, low threshold ok
-    kTAOk = 0x10,           // bit 4 = 1, TA ok
-    kADC976Ok = 0x08,       // bit 3 = 1, ADC 976 ok
-    kGood = 0xff            // bit[0~2] = 111. reserved
+    kPowerOk = 0x0080,        // bit 7 = 1, power not resetted. VA locked then power reset
+    kHThresholdOk = 0x0040,   // bit 6 = 1, high threshold ok
+    kLThresholdOk = 0x0020,   // bit 5 = 1, low threshold ok
+    kTAOk = 0x0010,           // bit 4 = 1, TA ok
+    kADC976Ok = 0x0008,       // bit 3 = 1, ADC 976 ok
+    kGood = 0x00ff            // bit[0~2] = 111. reserved
   };
 }
 
 //-------------------------------------------------------------------
 namespace DmpERunMode{
   enum Type{
+    kUnknow = -1,
     kOriginal = 0,
     kCompress = 1,
     kCalDAC = 2,
-    kUnknow = 3
+    kMixed = 3  // this is for whole event. one event cantains many Fee, each Fee has a run mode, they may mixed
   };
 }
 

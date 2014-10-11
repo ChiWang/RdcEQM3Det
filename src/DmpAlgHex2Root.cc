@@ -1,26 +1,28 @@
 /*
- *  $Id: DmpAlgHex2Root.cc, 2014-09-22 16:55:31 DAMPE $
+ *  $Id: DmpAlgHex2Root.cc, 2014-10-08 18:10:32 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 27/05/2014
 */
 
 #include <stdlib.h>     // getenv()
 #include "DmpEvtHeader.h"
+#include "DmpMetadata.h"
 #include "DmpDataBuffer.h"
 #include "DmpAlgHex2Root.h"
+#include "DmpCore.h"
 
 //-------------------------------------------------------------------
 DmpAlgHex2Root::DmpAlgHex2Root()
- :DmpVAlg("Rdc/Hex2Root/EQM"),fGoodRawEventID(0),fEvtHeader(0),
-  fCNCTPathBgo("NO"),fEvtBgo(0),
-  fCNCTPathPsd("NO"),fEvtPsd(0),
-  fCNCTPathNud("NO"),fEvtNud(0)
-  //fCNCTPathStk("NO"),fEvtStk(0)
+ :DmpVAlg("Rdc/Hex2Root/EQM"),fGoodRawEventID(0),fEvtHeader(0),fMetadata(0),
+  fEvtBgo(0),fEvtPsd(0),fEvtNud(0)
+  //fEvtStk(0)
 {
-  OptMap.insert(std::make_pair("Connector/Bgo", 1));
-  OptMap.insert(std::make_pair("Connector/Psd", 4));
-  OptMap.insert(std::make_pair("Connector/Stk", 5));
-  OptMap.insert(std::make_pair("Connector/Nud", 7));
+  fMetadata = new DmpMetadata();
+  gDataBuffer->RegisterObject("Metadata/Rdc/JobOpt",fMetadata,"DmpMetadata");
+  std::string prefix = (std::string)getenv("DMPSWSYS")+"/share/Connector/";
+  fMetadata->SetOption("Bgo/Connector",prefix+"Bgo/EQM");
+  fMetadata->SetOption("Psd/Connector",prefix+"Psd/EQM");
+  fMetadata->SetOption("Stk/Connector",prefix+"Stk/EQM");
   //gRootIOSvc->Set("Output/Key","rdc");
 }
 
@@ -30,41 +32,7 @@ DmpAlgHex2Root::~DmpAlgHex2Root(){
 
 //-------------------------------------------------------------------
 void DmpAlgHex2Root::Set(const std::string &type, const std::string &argv){
-  if(OptMap.find(type) == OptMap.end()){
-    DmpLogError<<"[DmpAlgHex2Root::Set] No argument type: "<<type<<DmpLogEndl;
-    DmpLogCout<<"\tPossible options are:"<<DmpLogEndl;
-    for(std::map<std::string,short>::iterator anOpt= OptMap.begin();anOpt!=OptMap.end();anOpt++){
-      DmpLogCout<<"\t\t"<<anOpt->first<<DmpLogEndl;
-    }
-    throw;
-  }
-// *
-// *  TODO: if release, use DMPSWSYS
-// *
-  std::string prefix = (std::string)getenv("DMPSWWORK")+"/share/Connector/";
-  //std::string prefix = (std::string)getenv("DMPSWSYS")+"/share/Connector/";
-  switch (OptMap[type]){
-    case 1: // Connector/Bgo
-    {
-      fCNCTPathBgo = prefix+argv;
-      break;
-    }
-    case 4: // Connector/Psd
-    {
-      fCNCTPathPsd = prefix+argv;
-      break;
-    }
-    case 5: // Connector/Stk
-    {
-      //fCNCTPathStk = prefix+argv;
-      break;
-    }
-    case 7: // Connector/Nud
-    {
-      fCNCTPathNud = prefix+argv;
-      break;
-    }
-  }
+  fMetadata->SetOption(type,argv);
 }
 
 //-------------------------------------------------------------------
@@ -78,9 +46,7 @@ bool DmpAlgHex2Root::Initialize(){
     fOutError.open(name.c_str(),std::ios::out|std::ios::binary);
   }
   fEvtHeader = new DmpEvtHeader();
-  if(not gDataBuffer->RegisterObject("Event/Rdc/EventHeader",fEvtHeader,"DmpEvtHeader")){
-    return false;
-  }
+  gDataBuffer->RegisterObject("Event/Rdc/EventHeader",fEvtHeader,"DmpEvtHeader");
   bool bgo = InitializeBgo();
   bool psd = InitializePsd();
   bool nud = InitializeNud();
@@ -88,7 +54,6 @@ bool DmpAlgHex2Root::Initialize(){
 }
 
 //-------------------------------------------------------------------
-#include "DmpCore.h"
 bool DmpAlgHex2Root::ProcessThisEvent(){
   while(fEventInBuf.size() == 0){
     if(fFile.eof() || (fFile.tellg() == -1)){
@@ -117,11 +82,14 @@ bool DmpAlgHex2Root::Finalize(){
 //-------------------------------------------------------------------
 bool DmpAlgHex2Root::ProcessThisEventHeader(const long &id){
   if(fHeaderBuf.find(id) == fHeaderBuf.end()){
-  std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
     return false;
   }
+  fEvtHeader->Reset();
   fEvtHeader->fEventID = gCore->GetCurrentEventID();
-  fEvtHeader->SetTime(fHeaderBuf[id]->Time);
+  for(size_t i=0;i<4;++i){        // 4 bytes second
+    fEvtHeader->fSecond = fEvtHeader->fSecond *256 + (short)(unsigned char)fHeaderBuf[id]->Time[i];
+  }
+  fEvtHeader->fMillisecond = (short)(unsigned char)fHeaderBuf[id]->Time[4]*256 + (short)(unsigned char)fHeaderBuf[id]->Time[5]; // 2 bytes millisecond
   return true;
 }
 
@@ -216,8 +184,8 @@ _FeeData::_FeeData(char *data,const short &bytes,const unsigned short &crc){
   if(crc_cal != crc){
     Navigator.CRCFlag = false;
   }
-  Navigator.PackageFlag = Signal[0];
-  Navigator.RunMode = (Signal[1]>>6)&0x0003;    // 1100 0000
+  Navigator.PackageFlag = (short)(unsigned char)Signal[0];
+  Navigator.RunMode = (DmpERunMode::Type)((Signal[1]>>6)&0x0003);    // 1100 0000
   Navigator.FeeID = Signal[1]&0x003f; // &0011 1111
   Signal.erase(Signal.begin(),Signal.begin()+4);    // NOTE: 1 byte pkgFlag, 1 byte runMode_feeID, 2 bytes for data length
   Navigator.Trigger = (short)(unsigned char)Signal[Signal.size()-1];

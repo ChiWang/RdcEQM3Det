@@ -1,11 +1,13 @@
 /*
- *  $Id: ProcessThisEventBgo.cc, 2014-08-31 22:47:11 DAMPE $
+ *  $Id: ProcessThisEventBgo.cc, 2014-10-09 21:43:42 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 09/03/2014
  *    Yifeng WEI (weiyf@mail.ustc.edu.cn) 24/04/2014
 */
 
+#include "DmpEvtHeader.h"
 #include "DmpEvtBgoRaw.h"
+#include "DmpMetadata.h"
 #include "DmpDataBuffer.h"
 #include "DmpAlgHex2Root.h"
 #include "DmpBgoBase.h"
@@ -15,19 +17,14 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 bool DmpAlgHex2Root::InitializeBgo(){
-  if(fCNCTPathBgo == "NO"){
-    DmpLogInfo<<"No set connector:\tBgo"<<DmpLogEndl;
-    return true;
-  }else{
-    DmpLogInfo<<"Setting connector:\tBgo"<<DmpLogEndl;
-  }
+  DmpLogInfo<<"Initialize\tBgo: Setting connector"<<DmpLogEndl;
   // setup connector
   short feeID=0, channelNo=0, channelID=0, layerID=0, barID=0, sideID=0, dyID=0;
   boost::filesystem::directory_iterator end_iter;
-  for(boost::filesystem::directory_iterator iter(fCNCTPathBgo);iter!=end_iter;++iter){
+  for(boost::filesystem::directory_iterator iter(fMetadata->Option["Bgo/Connector"]);iter!=end_iter;++iter){
     if(iter->path().extension() != ".cnct") continue;
     ifstream cnctFile(iter->path().string().c_str());
-    if (not cnctFile.good()){
+    if(not cnctFile.good()){
       DmpLogError<<"\t\treading cnct file ("<<iter->path().string()<<") failed"<<DmpLogEndl;
       cnctFile.close();
       return false;
@@ -47,9 +44,7 @@ bool DmpAlgHex2Root::InitializeBgo(){
   }
   //-------------------------------------------------------------------
   fEvtBgo = new DmpEvtBgoRaw();
-  if(not gDataBuffer->RegisterObject("Event/Rdc/Bgo",fEvtBgo,"DmpEvtBgoRaw")){
-    return false;
-  }
+  gDataBuffer->RegisterObject("Event/Rdc/Bgo",fEvtBgo,"DmpEvtBgoRaw");
   return true;
 }
 
@@ -59,29 +54,59 @@ bool DmpAlgHex2Root::ProcessThisEventBgo(const long &id){
   std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
     return false;
   }
+  short lastTrigger = fEvtBgo->GetTrigger();
   fEvtBgo->Reset();
   for(size_t i=0;i<DmpParameterBgo::kFeeNo;++i){
-    fEvtBgo->SetFeeNavigator(fBgoBuf[id][i]->Navigator);
+    fEvtBgo->fFeeNavig.push_back(fBgoBuf[id][i]->Navigator);
     short feeID = fBgoBuf[id][i]->Navigator.FeeID;
     if(DmpERunMode::kCompress == fBgoBuf[id][i]->Navigator.RunMode){
       short nChannel = fBgoBuf[id][i]->Signal.size()/3;
       for(size_t c=0;c<nChannel;++c){
         short channelID = (short)(unsigned char)fBgoBuf[id][i]->Signal[3*c];
         short v = (short)((fBgoBuf[id][i]->Signal[3*c+1]<<8) | (fBgoBuf[id][i]->Signal[3*c+2]&0x00ff));
-        fEvtBgo->AppendSignal(fMapBgo[feeID*1000+channelID],v);
+        fEvtBgo->fADC.insert(std::make_pair(fMapBgo[feeID*1000+channelID],v));
       }
     }else if(DmpERunMode::kOriginal == fBgoBuf[id][i]->Navigator.RunMode || DmpERunMode::kCalDAC == fBgoBuf[id][i]->Navigator.RunMode){
       short nChannel = fBgoBuf[id][i]->Signal.size()/2;
       for(size_t c=0;c<nChannel;++c){
         short v = (short)((fBgoBuf[id][i]->Signal[2*c]<<8) | (fBgoBuf[id][i]->Signal[2*c+1]&0x00ff));
-        fEvtBgo->AppendSignal(fMapBgo[feeID*1000+c],v);
+        fEvtBgo->fADC.insert(std::make_pair(fMapBgo[feeID*1000+c],v));
       }
     }else{
-      DmpLogError<<" Wrong mode... FeeID = "<<std::hex<<fBgoBuf[id][i]->Navigator.FeeID<<"\tmode "<<fBgoBuf[id][i]->Navigator.RunMode<<std::dec<<std::endl;
+      DmpLogError<<" Wrong mode... FeeID = "<<std::hex<<fBgoBuf[id][i]->Navigator.FeeID<<"\tmode "<<fBgoBuf[id][i]->Navigator.RunMode<<std::dec; PrintTime();
     }
   }
-  fEvtBgo->GenerateStatus();
+  short currentTrigger = fEvtBgo->GetTrigger();
+  if(currentTrigger == -1){
+    DmpLogError<<"Fee(Bgo) triggers not match";PrintTime();
+    for(short i=0;i<fEvtBgo->fFeeNavig.size();++i){
+      DmpLogCout<<"\t\tFee_0x"<<std::hex<<fEvtBgo->fFeeNavig[i].FeeID<<",\t trigger = "<<fEvtBgo->fFeeNavig[i].Trigger<<std::dec<<DmpLogEndl;
+    }
+    fEvtHeader->fBgoStatus = fEvtHeader->fBgoStatus | DmpEvtHeader::kTriggerNotMatch;
+  }
+  if(-1 != lastTrigger && (lastTrigger+1 & currentTrigger) != currentTrigger){
+    DmpLogWarning<<"Bgo trigger not continuous:\t"<<lastTrigger<<" ---> "<<currentTrigger;PrintTime();
+    fEvtHeader->fBgoStatus = fEvtHeader->fBgoStatus | DmpEvtHeader::kTriggerSkipped;
+  }
+  CheckFeeFlag_Bgo();
   return true;
 }
 
+//-------------------------------------------------------------------
+void DmpAlgHex2Root::CheckFeeFlag_Bgo(){
+  for(size_t i=0;i<fEvtBgo->fFeeNavig.size();++i){
+    if(false ==  fEvtBgo->fFeeNavig[i].CRCFlag){
+      DmpLogError<<"Fee(Bgo)_0x"<<std::hex<<fEvtBgo->fFeeNavig[i].FeeID<<std::dec<<"\tCRC error";PrintTime();
+      fEvtHeader->fBgoStatus = DmpEvtHeader::kCRCError;
+    }
+    if(DmpETriggerFlag::kCheckWrong == fEvtBgo->fFeeNavig[i].TriggerFlag){
+      DmpLogError<<"Fee(Bgo)_0x"<<std::hex<<fEvtBgo->fFeeNavig[i].FeeID<<std::dec<<"\ttrigger flag error";PrintTime();
+      fEvtHeader->fBgoStatus = fEvtHeader->fBgoStatus | DmpEvtHeader::kTriggerFlagError;
+    }
+    if(DmpEPackageFlag::kGood != fEvtBgo->fFeeNavig[i].PackageFlag){
+      DmpLogError<<"Fee(Bgo)_0x"<<std::hex<<fEvtBgo->fFeeNavig[i].FeeID<<"\tpackage flag error:\t"<<fEvtBgo->fFeeNavig[i].PackageFlag<<std::dec;PrintTime();
+      fEvtHeader->fBgoStatus = fEvtHeader->fBgoStatus | DmpEvtHeader::kPackageFlagError;
+    }
+  }
+}
 

@@ -1,5 +1,5 @@
 /*
- *  $Id: DmpEventRawLinkDef.h, 2014-08-07 16:30:35 DAMPE $
+ *  $Id: DmpEventRawLinkDef.h, 2014-10-11 17:13:08 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 07/08/2014
 */
@@ -13,11 +13,10 @@
 #pragma link C++ nestedtypedef;
 #pragma link C++ class DmpEvtHeader+;
 #pragma link C++ class DmpFeeNavig+;
-//#pragma link C++ typedef V_DmpFeeNavig;
 
 #pragma link C++ class DmpEvtBgoRaw+;
-//#pragma link C++ class DmpEvtPsdRaw+;
-//#pragma link C++ class DmpEvtNudRaw+;
+#pragma link C++ typedef DmpEvtPsdRaw;
+#pragma link C++ class DmpEvtNudRaw+;
 
 #endif
 
