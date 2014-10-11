@@ -21,7 +21,7 @@ bool DmpAlgHex2Root::InitializeBgo(){
   // setup connector
   short feeID=0, channelNo=0, channelID=0, layerID=0, barID=0, sideID=0, dyID=0;
   boost::filesystem::directory_iterator end_iter;
-  for(boost::filesystem::directory_iterator iter(fMetadata->Option["Bgo/Connector"]);iter!=end_iter;++iter){
+  for(boost::filesystem::directory_iterator iter(fMetadata->GetValue("Bgo/Connector"));iter!=end_iter;++iter){
     if(iter->path().extension() != ".cnct") continue;
     ifstream cnctFile(iter->path().string().c_str());
     if(not cnctFile.good()){

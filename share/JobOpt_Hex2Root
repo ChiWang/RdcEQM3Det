@@ -24,7 +24,7 @@ import libDmpHex2Root as Hex2Root
 #-------------------------------------------------------------------
 # RootIOSvc Service
 DMPSW.RootIOSvc.Set("Input/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
-DMPSW.RootIOSvc.Set("Input/FileName","A2_20140912_093933.frd")
+DMPSW.RootIOSvc.Set("Input/FileName","A2_20140909_183743.frd")
 #DMPSW.RootIOSvc.Set("Output/Path","./test")
 #DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
 DMPSW.RootIOSvc.Set("Output/WriteList","Event/Rdc;Metadata/Rdc")  # split by ;
@@ -34,7 +34,7 @@ DMPSW.RootIOSvc.Set("Output/WriteList","Event/Rdc;Metadata/Rdc")  # split by ;
 rdcAlgBT = Hex2Root.DmpAlgHex2Root()
 #rdcAlgBT.Set("Connector/Psd","Psd/EQM")
 #rdcAlgBT.Set("Connector/Stk",Stk/EQM")
-rdcAlgBT.Set("Bgo/Connector","./Connector/Bgo/EQM")
+rdcAlgBT.Set("Bgo/Connector",DMPSW.WorkPath+"/share/Connector/Bgo/EQM")
 #rdcAlgBT.Set("Connector/Nud","Nud/EQM")
 #rdcAlgBT.Set("BinaryFile","A2_20140910_123726.frd")
 #rdcAlgBT.Set("BinaryFile","A2_20140912_092040.frd")
