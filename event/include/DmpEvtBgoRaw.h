@@ -25,8 +25,7 @@ public:
   ~DmpEvtBgoRaw();
   DmpEvtBgoRaw &operator=(const DmpEvtBgoRaw &r);
   void  Reset();
-  void  LoadFrom(const DmpEvtBgoRaw &r);
-  void  LoadFrom(DmpEvtBgoRaw *&r);
+  void  LoadFrom(DmpEvtBgoRaw *r);
 
 public:
   DmpERunMode::Type GetRunMode(const short &i=99)const;

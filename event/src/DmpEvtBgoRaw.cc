@@ -32,14 +32,7 @@ void DmpEvtBgoRaw::Reset(){
 }
 
 //-------------------------------------------------------------------
-void DmpEvtBgoRaw::LoadFrom(const DmpEvtBgoRaw &r){
-  Reset();
-  fFeeNavig = r.fFeeNavig;
-  fADC = r.fADC;
-}
-
-//-------------------------------------------------------------------
-void DmpEvtBgoRaw::LoadFrom(DmpEvtBgoRaw *&r){
+void DmpEvtBgoRaw::LoadFrom(DmpEvtBgoRaw *r){
   Reset();
   fFeeNavig = r->fFeeNavig;
   fADC = r->fADC;

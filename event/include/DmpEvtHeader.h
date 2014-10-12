@@ -19,8 +19,7 @@ public:
   ~DmpEvtHeader();
   DmpEvtHeader &operator=(const DmpEvtHeader &r);
   void Reset();
-  void LoadFrom(const DmpEvtHeader &r);
-  void LoadFrom(DmpEvtHeader *&r);
+  void LoadFrom(DmpEvtHeader *r);
 
 public:
   bool IsGoodEvent(const short &id=99)const;

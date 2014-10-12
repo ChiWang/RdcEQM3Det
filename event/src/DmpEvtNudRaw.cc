@@ -28,14 +28,9 @@ void DmpEvtNudRaw::Reset(){
 }
 
 //-------------------------------------------------------------------
-void DmpEvtNudRaw::LoadFrom(const DmpEvtNudRaw &r){
+void DmpEvtNudRaw::LoadFrom(DmpEvtNudRaw *r){
   Reset();
-  fADC = r.fADC;
-}
-
-//-------------------------------------------------------------------
-void DmpEvtNudRaw::LoadFrom(DmpEvtNudRaw *&r){
-  Reset();
+  fFeeNavig = r->fFeeNavig;
   fADC = r->fADC;
 }
 

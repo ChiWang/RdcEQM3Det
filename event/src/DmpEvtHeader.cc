@@ -49,18 +49,7 @@ void DmpEvtHeader::Reset(){
 }
 
 //-------------------------------------------------------------------
-void DmpEvtHeader::LoadFrom(const DmpEvtHeader &r){
-  fEventID = r.fEventID;
-  fSecond = r.fSecond;
-  fMillisecond = r.fMillisecond;
-  fPsdStatus = r.fPsdStatus;
-  fStkStatus = r.fStkStatus;
-  fBgoStatus = r.fBgoStatus;
-  fNudStatus = r.fNudStatus;
-}
-
-//-------------------------------------------------------------------
-void DmpEvtHeader::LoadFrom(DmpEvtHeader *&r){
+void DmpEvtHeader::LoadFrom(DmpEvtHeader *r){
   fEventID = r->fEventID;
   fSecond = r->fSecond;
   fMillisecond = r->fMillisecond;

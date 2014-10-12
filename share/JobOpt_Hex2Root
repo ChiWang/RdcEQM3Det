@@ -24,7 +24,7 @@ import libDmpHex2Root as Hex2Root
 #-------------------------------------------------------------------
 # RootIOSvc Service
 DMPSW.RootIOSvc.Set("Input/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
-DMPSW.RootIOSvc.Set("Input/FileName","A2_20140909_183743.frd")
+DMPSW.RootIOSvc.Set("Input/FileName","A2_20140912_150750.frd")
 #DMPSW.RootIOSvc.Set("Output/Path","./test")
 #DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
 DMPSW.RootIOSvc.Set("Output/WriteList","Event/Rdc;Metadata/Rdc")  # split by ;

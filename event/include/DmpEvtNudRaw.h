@@ -25,8 +25,7 @@ public:
   ~DmpEvtNudRaw();
   DmpEvtNudRaw &operator=(const DmpEvtNudRaw &r);
   void  Reset();
-  void  LoadFrom(const DmpEvtNudRaw &r);
-  void  LoadFrom(DmpEvtNudRaw *&r);
+  void  LoadFrom(DmpEvtNudRaw *r);
 
 public:
   DmpERunMode::Type GetRunMode()const;
