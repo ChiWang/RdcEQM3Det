@@ -34,7 +34,7 @@ void DmpEvtNudRaw::LoadFrom(const DmpEvtNudRaw &r){
 }
 
 //-------------------------------------------------------------------
-void DmpEvtNudRaw::LoadFrom(const DmpEvtNudRaw *&r){
+void DmpEvtNudRaw::LoadFrom(DmpEvtNudRaw *&r){
   Reset();
   fADC = r->fADC;
 }

@@ -39,7 +39,7 @@ void DmpEvtBgoRaw::LoadFrom(const DmpEvtBgoRaw &r){
 }
 
 //-------------------------------------------------------------------
-void DmpEvtBgoRaw::LoadFrom(const DmpEvtBgoRaw *&r){
+void DmpEvtBgoRaw::LoadFrom(DmpEvtBgoRaw *&r){
   Reset();
   fFeeNavig = r->fFeeNavig;
   fADC = r->fADC;

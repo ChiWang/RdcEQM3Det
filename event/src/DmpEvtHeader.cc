@@ -60,7 +60,7 @@ void DmpEvtHeader::LoadFrom(const DmpEvtHeader &r){
 }
 
 //-------------------------------------------------------------------
-void DmpEvtHeader::LoadFrom(const DmpEvtHeader *&r){
+void DmpEvtHeader::LoadFrom(DmpEvtHeader *&r){
   fEventID = r->fEventID;
   fSecond = r->fSecond;
   fMillisecond = r->fMillisecond;
