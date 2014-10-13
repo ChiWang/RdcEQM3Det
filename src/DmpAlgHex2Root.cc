@@ -5,8 +5,6 @@
 */
 
 #include <stdlib.h>     // getenv()
-#include "DmpEvtHeader.h"
-#include "DmpMetadata.h"
 #include "DmpDataBuffer.h"
 #include "DmpAlgHex2Root.h"
 #include "DmpCore.h"
@@ -68,6 +66,7 @@ bool DmpAlgHex2Root::ProcessThisEvent(){
   bool bgo = ProcessThisEventBgo(eventID);
   bool psd = ProcessThisEventPsd(eventID);
   bool nud = ProcessThisEventNud(eventID);
+  GlobalTriggerCheck();
   EraseBuffer(eventID);
   return (header && bgo && psd && nud);
 }
@@ -91,6 +90,27 @@ bool DmpAlgHex2Root::ProcessThisEventHeader(const long &id){
   }
   fEvtHeader->fMillisecond = (short)(unsigned char)fHeaderBuf[id]->Time[4]*256 + (short)(unsigned char)fHeaderBuf[id]->Time[5]; // 2 bytes millisecond
   return true;
+}
+
+//-------------------------------------------------------------------
+void DmpAlgHex2Root::GlobalTriggerCheck(){
+// *
+// *  TODO: check triggers match
+// *
+  fEvtHeader->fTrigger = fEvtBgo->GetTrigger();
+  if(fEvtHeader->fTrigger != fEvtPsd->GetTrigger()){
+    fEvtHeader->fTrigger = -9;
+    DmpLogWarning<<"Psd trigger not match trigger of Bgo"<<DmpLogEndl;
+// *
+// *  TODO: add stk triggers
+// *
+  //}else if(fEvtHeader->fTrigger != fEvtStk->GetTrigger()){
+  //  fEvtHeader->fTrigger = -90;
+    //DmpLogWarning<<"Stk trigger not match trigger of Bgo"<<DmpLogEndl;
+  }else if(fEvtHeader->fTrigger != fEvtNud->GetTrigger()){
+    fEvtHeader->fTrigger = -900;
+    DmpLogWarning<<"Nud trigger not match trigger of Bgo"<<DmpLogEndl;
+  }
 }
 
 //-------------------------------------------------------------------

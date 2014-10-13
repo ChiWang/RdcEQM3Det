@@ -23,6 +23,7 @@ public:
 
 public:
   bool IsGoodEvent(const short &id=99)const;
+  bool TriggerMatch()const;
   bool StkFake()const{return (fStkStatus&kFakeData);}
 
 public:
@@ -36,7 +37,8 @@ public:
     kFakeData  = 0x0004,
     kTriggerSkipped = 0x0002,   // it's not a error of current event
   };
-  short     fEventID;           // good event
+  long      fEventID;           // good event
+  short     fTrigger;           // trigger of this event 0~255. if < 0, tiggers not match(all sub-detectors' trigger)
   int       fSecond;            // time second
   short     fMillisecond;       // time millisecond
   unsigned short fPsdStatus;

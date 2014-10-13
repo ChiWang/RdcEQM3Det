@@ -5,8 +5,6 @@
  *    Yifeng WEI (weiyf@mail.ustc.edu.cn) 24/04/2014
 */
 
-#include "DmpEvtHeader.h"
-#include "DmpEvtNudRaw.h"
 #include "DmpDataBuffer.h"
 #include "DmpAlgHex2Root.h"
 #include "DmpParameterNud.h"

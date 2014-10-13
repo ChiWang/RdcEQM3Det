@@ -12,6 +12,7 @@ ClassImp(DmpEvtHeader)
 //-------------------------------------------------------------------
 DmpEvtHeader::DmpEvtHeader()
  :fEventID(-1),
+  fTrigger(-1),
   fSecond(-1),
   fMillisecond(-1),
   fPsdStatus(0x0000),
@@ -29,6 +30,7 @@ DmpEvtHeader::~DmpEvtHeader(){
 //-------------------------------------------------------------------
 DmpEvtHeader& DmpEvtHeader::operator=(const DmpEvtHeader &r){
   fEventID = r.fEventID;
+  fTrigger = r.fTrigger;
   fSecond = r.fSecond;
   fMillisecond = r.fMillisecond;
   fPsdStatus = r.fPsdStatus;
@@ -51,6 +53,7 @@ void DmpEvtHeader::Reset(){
 //-------------------------------------------------------------------
 void DmpEvtHeader::LoadFrom(DmpEvtHeader *r){
   fEventID = r->fEventID;
+  fTrigger = r->fTrigger;
   fSecond = r->fSecond;
   fMillisecond = r->fMillisecond;
   fPsdStatus = r->fPsdStatus;
@@ -72,8 +75,19 @@ bool DmpEvtHeader::IsGoodEvent(const short &id)const{
     v = not (fNudStatus & 0xfff0);
   }else if(id == 99){
     v = not ((fPsdStatus|fStkStatus|fBgoStatus|fNudStatus) & 0xfff0);
+    if(not TriggerMatch()){
+      v = false;
+    }
   }
   return v;
+}
+
+//-------------------------------------------------------------------
+bool DmpEvtHeader::TriggerMatch()const{
+  if(fTrigger < 0){
+    return false;
+  }
+  return true;
 }
 
 

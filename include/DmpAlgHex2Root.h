@@ -12,6 +12,9 @@
 
 #include "DmpFeeNavig.h"
 #include "DmpEvtPsdRaw.h"
+#include "DmpEvtNudRaw.h"
+#include "DmpEvtHeader.h"
+#include "DmpMetadata.h"
 #include "DmpVAlg.h"
 
 //-------------------------------------------------------------------
@@ -42,10 +45,6 @@ struct _FeeData{
 };
 
 //-------------------------------------------------------------------
-class DmpEvtNudRaw;
-class DmpEvtHeader;
-class DmpMetadata;
-
 class DmpAlgHex2Root : public DmpVAlg{
 /*
  *  DmpAlgHex2Root
@@ -87,6 +86,7 @@ private:
   DmpMetadata       *fMetadata;     // metadata of simulation
   DmpEvtHeader      *fEvtHeader;    // save me
   bool ProcessThisEventHeader(const long &id);    // convert event header
+  void GlobalTriggerCheck();  // sub-detectors' trigger match
   void PrintTime()const;
 
 private:    // Bgo
