@@ -27,6 +27,7 @@ bool DmpAlgHex2Root::InitializeBgo(){
     }
     cnctFile>>feeID;
     cnctFile>>channelNo;
+    DmpLogInfo<<"\tReading cnct file: "<<iter->path().string()<<"\tDone. ID = "<<feeID<<"\tN_channel = "<<channelNo<<DmpLogEndl;
     for(short s=0;s<channelNo;++s){
       cnctFile>>channelID;
       cnctFile>>layerID;
@@ -36,7 +37,6 @@ bool DmpAlgHex2Root::InitializeBgo(){
       fMapBgo.insert(std::make_pair(feeID*1000+channelID,DmpBgoBase::ConstructGlobalDynodeID(layerID,barID,sideID,dyID)));
     }
     cnctFile.close();
-    DmpLogInfo<<"\tReading cnct file: "<<iter->path().string()<<"\tDone. ID = "<<feeID<<"\tN_channel = "<<channelNo<<DmpLogEndl;
   }
   //-------------------------------------------------------------------
   fEvtBgo = new DmpEvtBgoRaw();

@@ -13,9 +13,30 @@
 #include <boost/filesystem/operations.hpp>
 bool DmpAlgHex2Root::InitializePsd(){
   DmpLogInfo<<"Initialize\tPsd: Setting connector"<<DmpLogEndl;
-// *
-// *  TODO: setup connector
-// *
+  // setup connector
+  short feeID=0, channelNo=0, channelID=0, layerID=0, stripID=0, sideID=0, dyID=0;
+  boost::filesystem::directory_iterator end_iter;
+  for(boost::filesystem::directory_iterator iter(fMetadata->GetValue("Psd/Connector"));iter!=end_iter;++iter){
+    if(iter->path().extension() != ".cnct") continue;
+    ifstream cnctFile(iter->path().string().c_str());
+    if(not cnctFile.good()){
+      DmpLogError<<"\t\treading cnct file ("<<iter->path().string()<<") failed"<<DmpLogEndl;
+      cnctFile.close();
+      return false;
+    }
+    cnctFile>>feeID;
+    cnctFile>>channelNo;
+    DmpLogInfo<<"\tReading cnct file: "<<iter->path().string()<<"\tDone. ID = "<<feeID<<"\tN_channel = "<<channelNo<<DmpLogEndl;
+    for(short s=0;s<channelNo;++s){
+      cnctFile>>channelID;
+      cnctFile>>layerID;
+      cnctFile>>stripID;
+      cnctFile>>sideID;
+      cnctFile>>dyID;
+      fMapPsd.insert(std::make_pair(feeID*1000+channelID,DmpPsdBase::ConstructGlobalDynodeID(layerID,stripID,sideID,dyID)));
+    }
+    cnctFile.close();
+  }
   //-------------------------------------------------------------------
   fEvtPsd = new DmpEvtPsdRaw();
   gDataBuffer->RegisterObject("Event/Rdc/Psd",fEvtPsd,"DmpEvtPsdRaw");
