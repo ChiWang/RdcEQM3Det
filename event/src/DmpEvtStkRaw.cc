@@ -1,47 +1,38 @@
-/*
- *  $Id: DmpEvtBgoRaw.cc, 2014-10-10 22:48:41 DAMPE $
- *  Author(s):
- *    Chi WANG (chiwang@mail.ustc.edu.cn) 24/04/2014
-*/
-
-#include "DmpEvtBgoRaw.h"
-ClassImp(DmpEvtBgoRaw)
+#include "DmpEvtStkRaw.h"
+ClassImp(DmpEvtStkRaw)
 
 //-------------------------------------------------------------------
-DmpEvtBgoRaw::DmpEvtBgoRaw()
+DmpEvtStkRaw::DmpEvtStkRaw()
 {
 }
 
 //-------------------------------------------------------------------
-DmpEvtBgoRaw::~DmpEvtBgoRaw(){
+DmpEvtStkRaw::~DmpEvtStkRaw(){
   Reset();
 }
 
 //-------------------------------------------------------------------
-DmpEvtBgoRaw& DmpEvtBgoRaw::operator=(const DmpEvtBgoRaw &r){
+DmpEvtStkRaw& DmpEvtStkRaw::operator=(const DmpEvtStkRaw &r){
   Reset();
   fFeeNavig = r.fFeeNavig;
-  fGlobalDyID = r.fGlobalDyID;
   fADC = r.fADC;
 }
 
 //-------------------------------------------------------------------
-void DmpEvtBgoRaw::Reset(){
+void DmpEvtStkRaw::Reset(){
   fFeeNavig.clear();
-  fGlobalDyID.clear();
   fADC.clear();
 }
 
 //-------------------------------------------------------------------
-void DmpEvtBgoRaw::LoadFrom(DmpEvtBgoRaw *r){
+void DmpEvtStkRaw::LoadFrom(DmpEvtStkRaw *r){
   Reset();
   fFeeNavig = r->fFeeNavig;
-  fGlobalDyID = r->fGlobalDyID;
   fADC = r->fADC;
 }
 
 //-------------------------------------------------------------------
-DmpERunMode::Type DmpEvtBgoRaw::GetRunMode(const short &index)const{
+DmpERunMode::Type DmpEvtStkRaw::GetRunMode(const short &index)const{
   DmpERunMode::Type a = DmpERunMode::kUnknow;
   if(fFeeNavig.size() != 0){
     if(index == 99){
@@ -60,27 +51,20 @@ DmpERunMode::Type DmpEvtBgoRaw::GetRunMode(const short &index)const{
 }
 
 //-------------------------------------------------------------------
-bool DmpEvtBgoRaw::TriggersMatch()const{
-  bool tmp = true;
-  short trig = fFeeNavig.at(0).GetTrigger();
-  for(size_t i=1;i<fFeeNavig.size();++i){
-    if(trig != fFeeNavig.at(i).GetTrigger()){
-      tmp = false;
-      break;
-    }
-  }
-  return tmp;
-}
-
-//-------------------------------------------------------------------
-short DmpEvtBgoRaw::GetTrigger(const short &index)const{
+short DmpEvtStkRaw::GetTrigger(const short &index)const{
   short trig = -1;
-  if(index == 99){  // check all Fee
-    if(TriggersMatch()){
+  if(fFeeNavig.size() != 0){
+    if(index == 99){  // check all Fee
       trig = fFeeNavig.at(0).GetTrigger();
+      for(size_t i=1;i<fFeeNavig.size();++i){
+        if(trig != fFeeNavig.at(i).GetTrigger()){
+          trig = -1;
+          break;
+        }
+      }
+    }else{
+      trig = fFeeNavig.at(index).GetTrigger();
     }
-  }else{
-    trig = fFeeNavig.at(index).GetTrigger();
   }
   return trig;
 }

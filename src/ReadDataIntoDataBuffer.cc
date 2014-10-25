@@ -1,5 +1,5 @@
 /*
- *  $Id: ReadDataIntoDataBuffer.cc, 2014-08-31 22:46:51 DAMPE $
+ *  $Id: ReadDataIntoDataBuffer.cc, 2014-10-22 18:29:36 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 08/08/2014
 */
@@ -7,14 +7,9 @@
 #include "DmpAlgHex2Root.h"
 #include "DmpEDetectorID.h"
 #include "DmpCore.h"
-#include "DmpParameterBgo.h"
-#include "DmpParameterPsd.h"
-#include "DmpParameterNud.h"
-#include "DmpParameterStk.h"
 
 bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
-  static short s_LastPkgID = -1, s_LastFeeTrg = -1, s_CurrentFeeTrg = 0;
-  static short s_TotalFeeNo = DmpParameterBgo::kFeeNo+DmpParameterNud::kFeeNo+DmpParameterPsd::kFeeNo+DmpParameterStk::kTrbNo;
+  static short s_LastPkgID = -1;
   unsigned int scientificHeader = 0;         // 4 bytes 0xe225 0813
   fFile.read((char*)(&scientificHeader),4);
   while(0xe2250813 != htobe32(scientificHeader)){
@@ -43,69 +38,56 @@ bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
   }
   s_LastPkgID = packetID;
   if(CheckE2250813DataLength(dataLength)){    // will find next 0xe2250813 as expected
-    for(short i=0;i<s_TotalFeeNo;++i){
       unsigned short feeHeader = 0;
       fFile.read((char*)(&feeHeader),2);
-      if(0xeb90 == htobe16(feeHeader)){
-        fFile.seekg((int)fFile.tellg()+2,std::ios::beg);    // NOTE: skip 1 byte pkgFlag, 1 byte runMode_feeID
-        fFile.read((char*)(&dataLength),2);
-        dataLength= htobe16(dataLength);
-        if(CheckEb90DataLength(dataLength)){
-          fFile.seekg((int)fFile.tellg()-4,std::ios::beg);  // 4 = 2 bytes data length + skipped 2 bytes
-          char data[dataLength];    // NOTE: include 1 pkgFlag, include 1 byte runMode_feeID, include 2 bytes of data length, include all scientific data, exclude 2 bytes of CRC
+      while(0xeb90 == htobe16(feeHeader)){
+        fFile.seekg((int)fFile.tellg()+1,std::ios::beg);    // NOTE: skip 1 byte pkgFlag
+        short feeID = 0;
+        fFile.read((char*)(&feeID),1);                 // NOTE: get Fee ID
+        DmpLogDebug<<std::hex<<"Reading feeID = "<<feeID<<std::dec<<std::endl;
+        if((feeID&0x003c) == 0x0030){     // for data of trigger system
+          fFile.seekg((int)fFile.tellg()-2,std::ios::beg);  // to the end of eb90. 2:  read 1 byte + skipped 1 byte
+          dataLength = 10;  // 10 bytes data of trigger, from the end of eb90, to the end of Check-Sum
+          char data[dataLength];
           fFile.read(data,dataLength);
-          unsigned short crc = 0;
-          fFile.read((char*)(&crc),2);
-          crc= htobe16(crc);
-          _FeeData *newFee = new _FeeData(data,dataLength,crc);
-          //DmpLogInfo<<"Fee ID 0x"<<std::hex<<newFee->Navigator.FeeID<<", Mode "<<newFee->Navigator.RunMode<<std::dec<<DmpLogEndl;
-          short detectorID = (newFee->Navigator.FeeID>>4)&0x03;
-          if(DmpEDetectorID::kStk == detectorID){
-            delete newFee;
-            continue;
-          }
-          if(i==0){ // trigger check
-            s_CurrentFeeTrg = newFee->Navigator.Trigger;
-            if((s_LastFeeTrg != -1) && ((s_CurrentFeeTrg&(s_LastFeeTrg+1)) != s_CurrentFeeTrg)){    // trigger continuous
-              DmpLogWarning<<"Fee trigger not continuous..."<<DmpLogEndl;
-            }
-            s_LastFeeTrg = s_CurrentFeeTrg;
-          }else{
-            if(newFee->Navigator.Trigger != s_CurrentFeeTrg){    // trigger match
-              DmpLogError<<" trigger_0 = "<<std::hex<<s_CurrentFeeTrg<<"\t trigger_"<<i<<" = "<<newFee->Navigator.Trigger<<std::dec<<DmpLogEndl;
-              delete newFee;
-              Exception(endOfLastHeader,"Trigger not match");
-              return false;
-            }
-          }
-          if(newFee->Navigator.CRCFlag){   // CRC check
-            if(DmpEDetectorID::kBgo == detectorID){
+          _TriggerData *newTrig = new _TriggerData(data,dataLength);
+          fTriggerBuf[fGoodRawEventID] = newTrig;
+        }else{
+          fFile.read((char*)(&dataLength),2);
+          dataLength= htobe16(dataLength);
+          if(CheckEb90DataLength(dataLength)){
+            fFile.seekg((int)fFile.tellg()-4,std::ios::beg);  // to the end of eb90. 4 = 2 bytes data length + skipped 1 byte pkgFlag + 1 byte feeID
+            dataLength += 2;    // NOTE: include: 1 byte pkgFlag, 1 byte runMode_feeID, 2 bytes data length, all scientific data, ADN 2 bytes of CRC
+            char data[dataLength];
+            fFile.read(data,dataLength);
+            _FeeData *newFee = new _FeeData(data,dataLength);
+            //DmpLogInfo<<"Fee ID 0x"<<std::hex<<newFee->Navigator.FeeID<<", Mode "<<newFee->Navigator.RunMode<<std::dec<<DmpLogEndl;
+            DmpEDetectorID::Type detID = newFee->Navigator.GetDetectorID();
+            if(DmpEDetectorID::kBgo == detID){
               fBgoBuf[fGoodRawEventID].push_back(newFee);
-            }else if(DmpEDetectorID::kPsd == detectorID){
+            }else if(DmpEDetectorID::kPsd == detID){
               fPsdBuf[fGoodRawEventID].push_back(newFee);
-            }else if(DmpEDetectorID::kNud == detectorID){
+            }else if(DmpEDetectorID::kNud == detID){
               fNudBuf[fGoodRawEventID] = newFee;
-            }else if(DmpEDetectorID::kStk == detectorID){
-              // *
-              // *  TODO: 
-              // *
+            }else if(DmpEDetectorID::kStk == detID){
+              fStkBuf[fGoodRawEventID].push_back(newFee);
             }else{
               Exception(endOfLastHeader,"Fee type error");
               return false;
             }
           }else{
-            Exception(endOfLastHeader,"CRC error");
+            Exception(endOfLastHeader,"Data length error [0xeb90]");
             return false;
           }
-        }else{
-          Exception(endOfLastHeader,"Data length error [0xeb90]");
-          return false;
         }
+        fFile.read((char*)(&feeHeader),2);
+      }
+      if(0xe225 == htobe16(feeHeader)){
+        fFile.seekg((int)fFile.tellg()-2,std::ios::beg);
       }else{
-        Exception(endOfLastHeader,"Not find 0xeb90");
+        Exception(endOfLastHeader,"Not find next 0xeb90");
         return false;
       }
-    }
   }else{
     Exception(endOfLastHeader,"Data length error [0xe2250813]");
     return false;
@@ -122,10 +104,10 @@ bool DmpAlgHex2Root::CheckE2250813DataLength(const int &n){
   fFile.seekg(skipPoint+n+1-8,std::ios::beg);   // time: 8 bytes. need 1
   unsigned int scientificHeader = 0;            // 4 bytes 0xe225 0813
   fFile.read((char*)(&scientificHeader),4);
+  fFile.seekg(skipPoint,std::ios::beg);
   if(0xe2250813 != htobe32(scientificHeader)){
     return false;
   }
-  fFile.seekg(skipPoint,std::ios::beg);
   return true;
 }
 

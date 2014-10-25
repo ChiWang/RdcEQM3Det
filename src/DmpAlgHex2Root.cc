@@ -1,10 +1,11 @@
 /*
- *  $Id: DmpAlgHex2Root.cc, 2014-10-08 18:10:32 DAMPE $
+ *  $Id: DmpAlgHex2Root.cc, 2014-10-24 01:51:47 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 27/05/2014
 */
 
 #include <stdlib.h>     // getenv()
+//#include "boost/lexical_cast.hpp"
 #include "DmpDataBuffer.h"
 #include "DmpAlgHex2Root.h"
 #include "DmpCore.h"
@@ -12,8 +13,7 @@
 //-------------------------------------------------------------------
 DmpAlgHex2Root::DmpAlgHex2Root()
  :DmpVAlg("Rdc/Hex2Root/EQM"),fGoodRawEventID(0),fEvtHeader(0),fMetadata(0),
-  fEvtBgo(0),fEvtPsd(0),fEvtNud(0)
-  //fEvtStk(0)
+  fEvtBgo(0),fEvtPsd(0),fEvtNud(0),fEvtStk(0)
 {
   fMetadata = new DmpMetadata();
   gDataBuffer->RegisterObject("Metadata/Rdc/JobOpt",fMetadata,"DmpMetadata");
@@ -45,14 +45,18 @@ bool DmpAlgHex2Root::Initialize(){
   }
   fEvtHeader = new DmpEvtHeader();
   gDataBuffer->RegisterObject("Event/Rdc/EventHeader",fEvtHeader,"DmpEvtHeader");
-  bool bgo = InitializeBgo();
   bool psd = InitializePsd();
+  bool stk = InitializeStk();
+  bool bgo = InitializeBgo();
   bool nud = InitializeNud();
-  return (bgo&&psd&&nud);
+  return (bgo&&psd&&nud&&stk);
 }
 
 //-------------------------------------------------------------------
 bool DmpAlgHex2Root::ProcessThisEvent(){
+// *
+// *  TODO: 
+// *
   while(fEventInBuf.size() == 0){
     if(fFile.eof() || (fFile.tellg() == -1)){
       DmpLogInfo<<"Reach the end of "<<gRootIOSvc->GetInputFileName()<<DmpLogEndl;
@@ -66,9 +70,9 @@ bool DmpAlgHex2Root::ProcessThisEvent(){
   bool bgo = ProcessThisEventBgo(eventID);
   bool psd = ProcessThisEventPsd(eventID);
   bool nud = ProcessThisEventNud(eventID);
-  GlobalTriggerCheck();
+  bool stk = ProcessThisEventStk(eventID);
   EraseBuffer(eventID);
-  return (header && bgo && psd && nud);
+  return (header && bgo && psd && nud && stk);
 }
 
 //-------------------------------------------------------------------
@@ -84,33 +88,48 @@ bool DmpAlgHex2Root::ProcessThisEventHeader(const long &id){
     return false;
   }
   fEvtHeader->Reset();
-  fEvtHeader->fEventID = gCore->GetCurrentEventID();
+  int s=0;
   for(size_t i=0;i<4;++i){        // 4 bytes second
-    fEvtHeader->fSecond = fEvtHeader->fSecond *256 + (short)(unsigned char)fHeaderBuf[id]->Time[i];
+    s = s*256 + (short)(unsigned char)fHeaderBuf[id]->Time[i];
   }
-  fEvtHeader->fMillisecond = (short)(unsigned char)fHeaderBuf[id]->Time[4]*256 + (short)(unsigned char)fHeaderBuf[id]->Time[5]; // 2 bytes millisecond
-  return true;
+  fEvtHeader->SetTime(s,((short)(unsigned char)fHeaderBuf[id]->Time[4]*256 + (short)(unsigned char)fHeaderBuf[id]->Time[5]));
+
+  return ProcessThisEventTrigger(id);
 }
 
 //-------------------------------------------------------------------
-void DmpAlgHex2Root::GlobalTriggerCheck(){
-// *
-// *  TODO: check triggers match
-// *
-  fEvtHeader->fTrigger = fEvtBgo->GetTrigger();
-  if(fEvtHeader->fTrigger != fEvtPsd->GetTrigger()){
-    fEvtHeader->fTrigger = -9;
-    DmpLogWarning<<"Psd trigger not match trigger of Bgo"<<DmpLogEndl;
-// *
-// *  TODO: add stk triggers
-// *
-  //}else if(fEvtHeader->fTrigger != fEvtStk->GetTrigger()){
-  //  fEvtHeader->fTrigger = -90;
-    //DmpLogWarning<<"Stk trigger not match trigger of Bgo"<<DmpLogEndl;
-  }else if(fEvtHeader->fTrigger != fEvtNud->GetTrigger()){
-    fEvtHeader->fTrigger = -900;
-    DmpLogWarning<<"Nud trigger not match trigger of Bgo"<<DmpLogEndl;
+bool DmpAlgHex2Root::ProcessThisEventTrigger(const long &id){
+  if(fTriggerBuf.find(id) == fTriggerBuf.end()){
+    return true;
   }
+  // Check_sum
+  static short nSize = fTriggerBuf[id]->Data.size();
+  unsigned short read_sum = (((unsigned short)(unsigned char)fTriggerBuf[id]->Data[nSize-2])<<8) + (unsigned short)(unsigned char)fTriggerBuf[id]->Data[nSize-1];
+  unsigned short cal_sum = 0;
+  for(size_t i=0;i<nSize-2;++i){
+    cal_sum += (unsigned short)(unsigned char)fTriggerBuf[id]->Data[i];
+  }
+  if(cal_sum != read_sum){
+    DmpLogError<<"trigger system data sum_check error:  read/cal: "<<std::hex<<read_sum<<" / "<<cal_sum<<std::dec; PrintTime();
+    fEvtHeader->SetTriggerSumCheckError();
+  }
+  // generated and enabled
+  unsigned short choosing;
+  choosing = ((unsigned short)(unsigned char)(fTriggerBuf[id]->Data[0]))<<8 + (fTriggerBuf[id]->Data[1] & 0x00c0) + (fTriggerBuf[id]->Data[1]&0x0003)<<4 + (fTriggerBuf[id]->Data[2]>>4 & 0x0008) + (fTriggerBuf[id]->Data[3]>>5 &0x0004);
+  choosing =  (choosing>>2 & 0x3fff);
+  fEvtHeader->SetTriggerChoose(choosing);
+  unsigned char generate,enable;
+  generate = (unsigned char)fTriggerBuf[id]->Data[2];
+  fEvtHeader->SetTriggerGenerate(generate);
+  enable = (unsigned char)fTriggerBuf[id]->Data[3];
+  fEvtHeader->SetTriggerEnable(enable);
+  // trigger ID
+  short trig = (((short)(unsigned char)(fTriggerBuf[id]->Data[4]&0x000f))<<8) + (short)(unsigned char)fTriggerBuf[id]->Data[5];   // NOTE: only save 2^12
+  fEvtHeader->SetTrigger(trig);
+  // delta time
+  float deltT  = ((((unsigned short)(unsigned char)(fTriggerBuf[id]->Data[6]))<<8) + (unsigned short)(unsigned char)(fTriggerBuf[id]->Data[7]))*0.0001;       // unit: millisecond
+  fEvtHeader->SetDeltaTime(deltT);
+  return true;
 }
 
 //-------------------------------------------------------------------
@@ -132,6 +151,10 @@ void DmpAlgHex2Root::EraseBuffer(const long &id){
     delete fNudBuf[id];
     fNudBuf.erase(id);
   }
+  if(fTriggerBuf.find(id) != fTriggerBuf.end()){
+    delete fTriggerBuf[id];
+    fTriggerBuf.erase(id);
+  }
   if(fBgoBuf.find(id) != fBgoBuf.end()){
     for(size_t i=0;i<fBgoBuf[id].size();++i){
       delete fBgoBuf[id][i];
@@ -144,19 +167,16 @@ void DmpAlgHex2Root::EraseBuffer(const long &id){
     }
     fPsdBuf.erase(id);
   }
+  if(fStkBuf.find(id) != fStkBuf.end()){
+    for(size_t i=0;i<fStkBuf[id].size();++i){
+      delete fStkBuf[id][i];
+    }
+    fStkBuf.erase(id);
+  }
   for(size_t i=0;i<fEventInBuf.size();++i){
     if(fEventInBuf[i] == id){
       fEventInBuf.erase(fEventInBuf.begin()+i);
     }
-  }
-}
-
-//-------------------------------------------------------------------
-_FeeData::_FeeData(const _FeeData &r){
-  Navigator = r.Navigator;
-  short n=r.Signal.size();
-  for(short i=0;i<n;++i){
-    Signal.push_back(r.Signal[i]);
   }
 }
 
@@ -195,21 +215,45 @@ unsigned short crc16_ccitt_tableH[256]={
  0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
  0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 };
-_FeeData::_FeeData(char *data,const short &bytes,const unsigned short &crc){
+
+_FeeData::_FeeData(char *data,const short &bytes){  // bytes: from the end of eb90 to the end of CRC
   unsigned short crc_cal = 0xffff;
-  for(short i=0;i<bytes;++i){
+  for(short i=0;i<bytes-2;++i){ // CRC check, from the end of eb90, to the beginning of CRC
     crc_cal = (crc_cal<<8) ^ crc16_ccitt_tableH[((crc_cal>>8) ^ (unsigned char)data[i]) & 0xff];
-    Signal.push_back(data[i]);
+    Signal.push_back(data[i]);      // Signal not has CRC
   }
-  if(crc_cal != crc){
-    Navigator.CRCFlag = false;
+  unsigned short crc_read = (((unsigned short)(unsigned char)data[bytes-2])<<8) + (unsigned short)(unsigned char)data[bytes-1];
+  if(not (Signal[0]&0x0080)){
+    Navigator.SetTag(DmpFeeNavig::tag_FeePowerOff);
   }
-  Navigator.PackageFlag = (short)(unsigned char)Signal[0];
-  Navigator.RunMode = (DmpERunMode::Type)((Signal[1]>>6)&0x0003);    // 1100 0000
-  Navigator.FeeID = Signal[1]&0x003f; // &0011 1111
+  if(not (Signal[0]&0x0040)){
+    Navigator.SetTag(DmpFeeNavig::tag_HThresholdError);
+  }
+  if(not (Signal[0]&0x0020)){
+    Navigator.SetTag(DmpFeeNavig::tag_LThresholdError);
+  }
+  if(not (Signal[0]&0x0010)){
+    Navigator.SetTag(DmpFeeNavig::tag_SettingTAWhileDataTaking);
+  }
+  if(not (Signal[0]&0x0008)){
+    Navigator.SetTag(DmpFeeNavig::tag_AD976Error);
+  }
+  Navigator.SetRunModeFeeID((unsigned char)Signal[1]);  // before Signal[0], since waring need FeeID
   Signal.erase(Signal.begin(),Signal.begin()+4);    // NOTE: 1 byte pkgFlag, 1 byte runMode_feeID, 2 bytes for data length
-  Navigator.Trigger = (short)(unsigned char)Signal[Signal.size()-1];
-  Navigator.TriggerFlag = (short)(unsigned char)Signal[Signal.size()-2]>>4;
+  if(Navigator.GetDetectorID() == DmpEDetectorID::kStk){      // exclude Stk, it's not trigger for stk at here
+// *
+// *  TODO:  check sum
+// *
+    Signal.erase(Signal.end()-2,Signal.end());        // 2 bytes for sum check
+  }
+  if(Signal[Signal.size()-2] & 0x0020){
+    Navigator.SetTag(DmpFeeNavig::tag_ReceivedTrigCheck_Error);
+  }
+  Navigator.SetTrigger((((short)(unsigned char)(Signal[Signal.size()-2]&0x000f))<<8) + (unsigned short)(unsigned char)Signal[Signal.size()-1]);
   Signal.erase(Signal.end()-2,Signal.end());        // 2 bytes for trigger
+  if(crc_cal != crc_read){
+    Navigator.SetTag(DmpFeeNavig::tag_CRCError);
+  }
 }
+
 

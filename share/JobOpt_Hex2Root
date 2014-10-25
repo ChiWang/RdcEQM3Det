@@ -15,17 +15,17 @@ import libDmpHex2Root as Hex2Root
 
 #-------------------------------------------------------------------
 # Global setting
-#DMPSW.Core.Set("EventNumber","4130")     # If NOT set, will use 1234567890
+DMPSW.Core.Set("EventNumber","4")     # If NOT set, will use 1234567890
 #DMPSW.Core.Set("StartTime","20130101-0000")     # if NOT set, start from launch time
 #DMPSW.Core.Set("StopTime","20160101-0000")      # if NOT set, end at 2113.01.01
-#DMPSW.Core.Set("LogLevel","Error")      # Value = {Error | Warning | Info | Debug}. If NOT set, will use Info.
+DMPSW.Core.Set("LogLevel","Debug")      # Value = {Error | Warning | Info | Debug}. If NOT set, will use Info.
 #DMPSW.Core.Set("LogHeader","On")
 
 #-------------------------------------------------------------------
 # RootIOSvc Service
-DMPSW.RootIOSvc.Set("Input/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
-DMPSW.RootIOSvc.Set("Input/FileName","A2_20140912_150750.frd")
-#DMPSW.RootIOSvc.Set("Output/Path","./test")
+DMPSW.RootIOSvc.Set("Input/Path",os.environ["DMPSWWORK"]+"/run/BT/sci")
+DMPSW.RootIOSvc.Set("Input/FileName","A2_20141024_181906.frd")
+DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/BT/raw")
 #DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
 DMPSW.RootIOSvc.Set("Output/WriteList","Event/Rdc;Metadata/Rdc")  # split by ;
 
@@ -45,6 +45,7 @@ rdcAlgBT.Set("Bgo/Connector",DMPSW.WorkPath+"/share/Connector/Bgo/EQM")
 #-------------------------------------------------------------------
 # Append user's service or algorithm into Kernel
 DMPSW.AlgMgr.Append(rdcAlgBT)
+#DMPSW.RootIOSvc.Set("Output/FileName","test.root")
 
 #-------------------------------------------------------------------
 # Run job

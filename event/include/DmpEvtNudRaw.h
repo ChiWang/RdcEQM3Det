@@ -1,5 +1,5 @@
 /*
- *  $Id: DmpEvtNudRaw.h, 2014-10-11 17:19:34 DAMPE $
+ *  $Id: DmpEvtNudRaw.h, 2014-10-24 17:21:22 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 24/04/2014
 */
@@ -7,7 +7,6 @@
 #ifndef DmpEvtNudRaw_H
 #define DmpEvtNudRaw_H
 
-#include <map>
 #include "DmpFeeNavig.h"
 
 //-------------------------------------------------------------------
@@ -33,7 +32,9 @@ public:
 
 public:
   DmpFeeNavig   fFeeNavig;
-  std::map<short,double>    fADC;   // key is channel ID: 0~3; value is ADC count
+  //std::map<short,double>    fADC;   // key is channel ID: 0~3; value is ADC count
+  short         fChannelID[4];
+  double        fADC[4];
 
   ClassDef(DmpEvtNudRaw,1)
 };

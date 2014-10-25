@@ -7,7 +7,7 @@
 #ifndef DmpEvtBgoRaw_H
 #define DmpEvtBgoRaw_H
 
-#include <map>
+//#include <map>
 #include "DmpFeeNavig.h"
 
 //-------------------------------------------------------------------
@@ -29,11 +29,14 @@ public:
 
 public:
   DmpERunMode::Type GetRunMode(const short &i=99)const;
+  bool  TriggersMatch()const;
   short GetTrigger(const short &i=99)const;
 
 public:
   std::vector<DmpFeeNavig>  fFeeNavig;
-  std::map<short,double>    fADC;      // key is global dynode ID, value is adc count
+  //std::map<short,double>    fADC;      // key is global dynode ID, value is adc count
+  std::vector<short>    fGlobalDyID;
+  std::vector<double>   fADC;
 
   ClassDef(DmpEvtBgoRaw,1)
 };

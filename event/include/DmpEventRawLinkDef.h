@@ -17,6 +17,7 @@
 #pragma link C++ class DmpEvtBgoRaw+;
 #pragma link C++ typedef DmpEvtPsdRaw;
 #pragma link C++ class DmpEvtNudRaw+;
+#pragma link C++ class DmpEvtStkRaw+;
 
 #endif
 

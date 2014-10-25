@@ -1,5 +1,5 @@
 /*
- *  $Id: DmpEvtNudRaw.cc, 2014-10-09 21:06:52 DAMPE $
+ *  $Id: DmpEvtNudRaw.cc, 2014-10-24 17:21:20 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 24/04/2014
 */
@@ -19,28 +19,33 @@ DmpEvtNudRaw::~DmpEvtNudRaw(){
 DmpEvtNudRaw& DmpEvtNudRaw::operator=(const DmpEvtNudRaw &r){
   Reset();
   fFeeNavig = r.fFeeNavig;
-  fADC = r.fADC;
+  for(size_t i=0;i<4;++i){
+    fChannelID[i] = r.fChannelID[i];
+    fADC[i] = r.fADC[i];
+  }
 }
 
 //-------------------------------------------------------------------
 void DmpEvtNudRaw::Reset(){
-  fADC.clear();
 }
 
 //-------------------------------------------------------------------
 void DmpEvtNudRaw::LoadFrom(DmpEvtNudRaw *r){
   Reset();
   fFeeNavig = r->fFeeNavig;
-  fADC = r->fADC;
+  for(size_t i=0;i<4;++i){
+    fChannelID[i] = r->fChannelID[i];
+    fADC[i] = r->fADC[i];
+  }
 }
 
 //-------------------------------------------------------------------
 DmpERunMode::Type DmpEvtNudRaw::GetRunMode()const{
-  return fFeeNavig.RunMode;
+  return fFeeNavig.GetRunMode();
 }
 
 //-------------------------------------------------------------------
 short DmpEvtNudRaw::GetTrigger()const{
-  return fFeeNavig.Trigger;
+  return fFeeNavig.GetTrigger();
 }
 
