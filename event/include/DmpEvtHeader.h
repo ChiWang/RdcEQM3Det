@@ -78,6 +78,8 @@ public:
 public: // Get functions
   bool IsGoodEvent(const short &id=99)const;
   short GetTrigger()const{return fTrigger;} // ONLY trigger of trigger system
+  const int &GetSecond()const{return fSecond;}
+  const short &GetMillisecond()const{return fMillisecond;}
   bool IsFakeData(const short &id)const;
   bool TriggerDataCheckRight()const{return (not fTriggerStatus[30]);}
   bool TriggersMatch(const short &id=99)const;  // if the argument is sub-det id, just check triggers of all fee of this sub-det
