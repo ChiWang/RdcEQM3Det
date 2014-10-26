@@ -61,16 +61,16 @@ std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
       for(size_t c=0;c<nChannel;++c){
         short channelID = (short)(unsigned char)fPsdBuf[id][i]->Signal[3*c];
         short v = (short)((fPsdBuf[id][i]->Signal[3*c+1]<<8) | (fPsdBuf[id][i]->Signal[3*c+2]&0x00ff));
-        //fEvtPsd->fADC.insert(std::make_pair(fMapPsd[feeID*1000+channelID],v));
-        fEvtPsd->fGlobalDynodeID.push_back(fMapPsd[feeID*1000+channelID]);
+        //fEvtPsd->fADC.insert(std::make_pair(fMapPsd.at(feeID*1000+channelID),v));
+        fEvtPsd->fGlobalDynodeID.push_back(fMapPsd.at(feeID*1000+channelID));
         fEvtPsd->fADC.push_back(v);
       }
     }else if(DmpERunMode::kOriginal == runMode || DmpERunMode::kCalDAC == runMode){
       short nChannel = fPsdBuf[id][i]->Signal.size()/2;
       for(size_t c=0;c<nChannel;++c){
         short v = (short)((fPsdBuf[id][i]->Signal[2*c]<<8) | (fPsdBuf[id][i]->Signal[2*c+1]&0x00ff));
-        //fEvtPsd->fADC.insert(std::make_pair(fMapPsd[feeID*1000+c],v));
-        fEvtPsd->fGlobalDynodeID.push_back(fMapPsd[feeID*1000+c]);
+        //fEvtPsd->fADC.insert(std::make_pair(fMapPsd.at(feeID*1000+c),v));
+        fEvtPsd->fGlobalDynodeID.push_back(fMapPsd.at(feeID*1000+c));
         fEvtPsd->fADC.push_back(v);
       }
     }else{

@@ -61,17 +61,21 @@ std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
       short nChannel = fBgoBuf[id][i]->Signal.size()/3;
       for(size_t c=0;c<nChannel;++c){
         short channelID = (short)(unsigned char)fBgoBuf[id][i]->Signal[3*c];
+        channelID += feeID*1000;
         short v = (short)((fBgoBuf[id][i]->Signal[3*c+1]<<8) | (fBgoBuf[id][i]->Signal[3*c+2]&0x00ff));
-        //fEvtBgo->fADC.insert(std::make_pair(fMapBgo[feeID*1000+channelID],v));
-        fEvtBgo->fGlobalDynodeID.push_back(fMapBgo[feeID*1000+channelID]);
+        //fEvtBgo->fADC.insert(std::make_pair(fMapBgo.at(feeID*1000+channelID),v));
+        if(fMapBgo.find(channelID) == fMapBgo.end()){
+          continue;
+        }
+        fEvtBgo->fGlobalDynodeID.push_back(fMapBgo.at(channelID));
         fEvtBgo->fADC.push_back(v);
       }
     }else if(DmpERunMode::kOriginal == runMode || DmpERunMode::kCalDAC == runMode){
       short nChannel = fBgoBuf[id][i]->Signal.size()/2;
       for(size_t c=0;c<nChannel;++c){
         short v = (short)((fBgoBuf[id][i]->Signal[2*c]<<8) | (fBgoBuf[id][i]->Signal[2*c+1]&0x00ff));
-        //fEvtBgo->fADC.insert(std::make_pair(fMapBgo[feeID*1000+c],v));
-        fEvtBgo->fGlobalDynodeID.push_back(fMapBgo[feeID*1000+c]);
+        //fEvtBgo->fADC.insert(std::make_pair(fMapBgo.at(feeID*1000+c),v));
+        fEvtBgo->fGlobalDynodeID.push_back(fMapBgo.at(feeID*1000+c));
         fEvtBgo->fADC.push_back(v);
       }
     }else{
