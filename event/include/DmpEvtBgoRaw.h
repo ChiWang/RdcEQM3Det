@@ -35,7 +35,7 @@ public:
 public:
   std::vector<DmpFeeNavig>  fFeeNavig;
   //std::map<short,double>    fADC;      // key is global dynode ID, value is adc count
-  std::vector<short>    fGlobalDyID;
+  std::vector<short>    fGlobalDynodeID;
   std::vector<double>   fADC;
 
   ClassDef(DmpEvtBgoRaw,1)
