@@ -78,6 +78,7 @@ public:
 public: // Get functions
   bool IsGoodEvent(const short &id=99)const;
   short GetTrigger()const{return fTrigger;} // ONLY trigger of trigger system
+  const float &GetDeltaTime()const{return fDeltaTime;}
   const int &GetSecond()const{return fSecond;}
   const short &GetMillisecond()const{return fMillisecond;}
   bool IsFakeData(const short &id)const;
