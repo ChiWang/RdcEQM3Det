@@ -12,7 +12,6 @@ ClassImp(DmpEvtHeader)
 //-------------------------------------------------------------------
 DmpEvtHeader::DmpEvtHeader(){
   Reset();
-  fTmpDeltaTime = 0;
 }
 
 //-------------------------------------------------------------------
@@ -34,11 +33,10 @@ DmpEvtHeader& DmpEvtHeader::operator=(const DmpEvtHeader &r){
 
 //-------------------------------------------------------------------
 void DmpEvtHeader::Reset(){
-  fTmpDeltaTime = fSecond*1000+fMillisecond;
   fTrigger = 0x0000;
-  fDeltaTime = 99.99;
-  fSecond = 0;
-  fMillisecond = 0;
+  fDeltaTime = 0.0;
+  //fSecond = 0;    // no NOT reset second and millisecond, they will be used in next event
+  //fMillisecond = 0;
   fTriggerStatus.reset();
   fPsdStatus.reset();
   fStkStatus.reset();
@@ -162,12 +160,18 @@ void DmpEvtHeader::SetTriggerEnable(const unsigned char &e){
 
 //-------------------------------------------------------------------
 void DmpEvtHeader::SetDeltaTime(const float &v){
-  fTmpDeltaTime = fSecond*1000 + fMillisecond - fTmpDeltaTime;
-  if(6 < fTmpDeltaTime){
-    fDeltaTime = fTmpDeltaTime>30000?30000:((fTmpDeltaTime/6)*6+v);
+  if(fTmpDeltaTime > 6){
+    fDeltaTime = (fTmpDeltaTime>999999)?-1:(fTmpDeltaTime/6)*6+v;
   }else{
     fDeltaTime = v;
   }
+}
+
+//-------------------------------------------------------------------
+void DmpEvtHeader::SetTime(const int &s,const short &ms){
+  fTmpDeltaTime = (s-fSecond)*1000 + ms - fMillisecond;
+  fSecond = s;
+  fMillisecond = ms;
 }
 
 //-------------------------------------------------------------------

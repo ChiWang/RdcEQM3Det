@@ -100,12 +100,12 @@ public: // Set functions
   void SetTriggerEnable(const unsigned char &e);
   void SetTrigger(const short &v){fTrigger = v;}
   void SetDeltaTime(const float &v);
-  void SetTime(const int &s,const short &ms){fSecond = s;fMillisecond = ms;}
+  void SetTime(const int &s,const short &ms);
   void SetTag(const short &detectorID,TagType tagType);
 
 private:
   short     fTrigger;       //bits: 15~12, not used. bits: 0~11, trigger ID(sub-detector has 2^12)
-  float     fDeltaTime;     // delta time of 2 triggers (combine delta time from trigger system, and fTmpDeltaTime), unit: millisecond
+  float     fDeltaTime;     // delta time of 2 triggers (combine delta time from trigger system, and event header), unit: millisecond
   int       fSecond;        // time second
   short     fMillisecond;   // time millisecond
   DmpTriggerStatus  fTriggerStatus;     // record all trigger information
@@ -113,7 +113,7 @@ private:
   DmpSubDetStatus   fStkStatus;
   DmpSubDetStatus   fBgoStatus;
   DmpSubDetStatus   fNudStatus;
-  int       fTmpDeltaTime;    //! update it by fSecond and fMillisecond. NOt save me
+  int     fTmpDeltaTime;    //! update it by fSecond and fMillisecond. NOt save me
 
   ClassDef(DmpEvtHeader,1)
 };
