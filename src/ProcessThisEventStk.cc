@@ -16,9 +16,8 @@ bool DmpAlgHex2Root::InitializeStk(){
 
 //-------------------------------------------------------------------
 bool DmpAlgHex2Root::ProcessThisEventStk(const long &id){
-
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
+  DmpLogDebug<<DmpLogEndl;
+  DmpLogDebug<<DmpLogEndl;
   return true;
 }
 

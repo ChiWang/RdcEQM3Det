@@ -21,10 +21,10 @@ bool DmpAlgHex2Root::InitializeNud(){
 //-------------------------------------------------------------------
 bool DmpAlgHex2Root::ProcessThisEventNud(const long &id){
   if(fNudBuf.find(id) == fNudBuf.end()){
-  std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
+    DmpLogError<<" (Nud) not find event "<<id<<DmpLogEndl;
     return false;
   }
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
+  DmpLogDebug<<DmpLogEndl;
   fEvtNud->Reset();
   fEvtNud->fFeeNavig = fNudBuf[id]->Navigator;
   for(size_t c=0;c<4;++c){        // 4 channels of Nud
@@ -51,7 +51,7 @@ std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
     fEvtHeader->SetTag(DmpEDetectorID::kNud,DmpEvtHeader::tag_TrigNotMatchTrigSys);
     DmpLogWarning<<"Nud trigger not match trigger system.\t Nud = "<<fEvtNud->GetTrigger()<<" trigger system = "<<fEvtHeader->GetTrigger();PrintTime();
   }
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
+  DmpLogDebug<<DmpLogEndl;
   return true;
 }
 

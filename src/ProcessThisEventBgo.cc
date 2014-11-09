@@ -1,5 +1,5 @@
 /*
- *  $Id: ProcessThisEventBgo.cc, 2014-10-24 14:52:18 DAMPE $
+ *  $Id: ProcessThisEventBgo.cc, 2014-11-06 00:22:01 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 09/03/2014
  *    Yifeng WEI (weiyf@mail.ustc.edu.cn) 24/04/2014
@@ -8,6 +8,7 @@
 #include "DmpDataBuffer.h"
 #include "DmpAlgHex2Root.h"
 #include "DmpBgoBase.h"
+#include "DmpCore.h"
 
 //-------------------------------------------------------------------
 #include <boost/filesystem/path.hpp>
@@ -17,7 +18,7 @@ bool DmpAlgHex2Root::InitializeBgo(){
   // setup connector
   short feeID=0, channelNo=0, channelID=0, layerID=0, barID=0, sideID=0, dyID=0;
   boost::filesystem::directory_iterator end_iter;
-  for(boost::filesystem::directory_iterator iter(fMetadata->GetValue("Bgo/Connector"));iter!=end_iter;++iter){
+  for(boost::filesystem::directory_iterator iter(GetConnector("Bgo"));iter!=end_iter;++iter){
     if(iter->path().extension() != ".cnct") continue;
     ifstream cnctFile(iter->path().string().c_str());
     if(not cnctFile.good()){
@@ -47,10 +48,10 @@ bool DmpAlgHex2Root::InitializeBgo(){
 //-------------------------------------------------------------------
 bool DmpAlgHex2Root::ProcessThisEventBgo(const long &id){
   if(fBgoBuf.find(id) == fBgoBuf.end()){
-  std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
+    DmpLogError<<" (Bgo) not find event "<<id<<DmpLogEndl;
     return false;
   }
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
+  DmpLogDebug<<DmpLogEndl;
   fEvtBgo->Reset();
   short nFee = fBgoBuf[id].size();
   for(short i=0;i<nFee;++i){
@@ -108,7 +109,7 @@ std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
     fEvtHeader->SetTag(DmpEDetectorID::kBgo,DmpEvtHeader::tag_TrigNotMatchTrigSys);
     DmpLogWarning<<"Bgo trigger not match trigger system.\t Bgo = "<<fEvtBgo->GetTrigger()<<" trigger system = "<<fEvtHeader->GetTrigger(); PrintTime();
   }
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
+  DmpLogDebug<<DmpLogEndl;
   return true;
 }
 

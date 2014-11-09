@@ -13,7 +13,10 @@ BOOST_PYTHON_MODULE(libDmpHex2Root){
   using namespace boost::python;
 
   // default algorithm
-  class_<DmpAlgHex2Root,boost::noncopyable,bases<DmpVAlg> >("DmpAlgHex2Root",init<>());
+  class_<DmpAlgHex2Root,boost::noncopyable,bases<DmpVAlg> >("DmpAlgHex2Root",init<>())
+    .def("SetConnector",&DmpAlgHex2Root::SetConnector)
+  ;
+  //class_<DmpAlgHex2Root,boost::noncopyable,bases<DmpVAlg> >("DmpAlgHex2Root",init<>());
 }
 
 

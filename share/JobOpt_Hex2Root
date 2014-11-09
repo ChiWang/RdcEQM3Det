@@ -1,6 +1,6 @@
 #! /usr/bin/python
 '''
- *  $Id: JobOpt_DmpHex2Root, 2014-09-18 21:13:09 DAMPE $
+ *  $Id: JobOpt_Hex2Root, 2014-11-06 13:47:56 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 11/03/2014
  *-----------------------------------------------------
@@ -15,38 +15,28 @@ import libDmpHex2Root as Hex2Root
 
 #-------------------------------------------------------------------
 # Global setting
-DMPSW.Core.Set("EventNumber","4")     # If NOT set, will use 1234567890
-#DMPSW.Core.Set("StartTime","20130101-0000")     # if NOT set, start from launch time
-#DMPSW.Core.Set("StopTime","20160101-0000")      # if NOT set, end at 2113.01.01
-#DMPSW.Core.Set("LogLevel","Debug")      # Value = {Error | Warning | Info | Debug}. If NOT set, will use Info.
-#DMPSW.Core.Set("LogHeader","On")
+#DMPSW.Core.MaxEventNumber("4")     #  default: -1 
+#DMPSW.Core.StartTime("2013-01-01 00:00:00")     # default: 2013-01-01 00:00:00
+#DMPSW.Core.StopTime("2016-01-01 00:00:00")      # default: 2053-01-01 00:00:00
+#DMPSW.Core.LogLevel("Debug")      # Value = {Error | Warning | Info | Debug}. default: Info
+#DMPSW.Core.LogHeader("On")        # default: Off
 
 #-------------------------------------------------------------------
 # RootIOSvc Service
-DMPSW.RootIOSvc.Set("Input/Path",os.environ["DMPSWWORK"]+"/run/BT/sci")
-DMPSW.RootIOSvc.Set("Input/FileName","A2_20141024_181906.frd")
-DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/BT/raw")
-#DMPSW.RootIOSvc.Set("Output/Path",os.environ["DMPSWWORK"]+"/run/data/sci")
-DMPSW.RootIOSvc.Set("Output/Path","./")
-DMPSW.RootIOSvc.Set("Output/WriteList","Event/Rdc;Metadata/Rdc")  # split by ;
+DMPSW.RootIOSvc.InputPath(os.environ["DMPSWWORK"]+"/run/BT/sci")
+DMPSW.RootIOSvc.InputFile("A2_20141024_181906.frd")
+#DMPSW.RootIOSvc.OutputPath(os.environ["DMPSWWORK"]+"/run/BT/raw")
+DMPSW.RootIOSvc.WriteList("Event/Rdc")  # split by ;
 
 #-------------------------------------------------------------------
 # Creat user's service or algorithm
 rdcAlgBT = Hex2Root.DmpAlgHex2Root()
-rdcAlgBT.Set("Psd/Connector",DMPSW.WorkPath+"/share/Connector/Psd/EQM")
-#rdcAlgBT.Set("Connector/Stk",Stk/EQM")
-rdcAlgBT.Set("Bgo/Connector",DMPSW.WorkPath+"/share/Connector/Bgo/EQM")
-#rdcAlgBT.Set("Connector/Nud","Nud/EQM")
-#rdcAlgBT.Set("BinaryFile","A2_20140910_123726.frd")
-#rdcAlgBT.Set("BinaryFile","A2_20140912_092040.frd")
-#rdcAlgBT.Set("BinaryFile","A2_20140910_124351.frd")
-#rdcAlgBT.Set("BinaryFile","A2_20140909_183743.frd")
-#rdcAlgBT.Set("BinaryFile","test_A2Data00_20140513_191731.frd")
+rdcAlgBT.SetConnector("Psd",DMPSW.WorkPath+"/share/Connector/Psd/EQM")
+rdcAlgBT.SetConnector("Bgo",DMPSW.WorkPath+"/share/Connector/Bgo/EQM")
 
 #-------------------------------------------------------------------
 # Append user's service or algorithm into Kernel
 DMPSW.AlgMgr.Append(rdcAlgBT)
-#DMPSW.RootIOSvc.Set("Output/FileName","test.root")
 
 #-------------------------------------------------------------------
 # Run job

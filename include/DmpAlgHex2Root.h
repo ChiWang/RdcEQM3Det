@@ -15,7 +15,6 @@
 #include "DmpEvtNudRaw.h"
 #include "DmpEvtStkRaw.h"
 #include "DmpEvtHeader.h"
-#include "DmpMetadata.h"
 #include "DmpVAlg.h"
 
 //-------------------------------------------------------------------
@@ -69,12 +68,13 @@ public:
   DmpAlgHex2Root();
   ~DmpAlgHex2Root();
 
-  void Set(const std::string&,const std::string&);
+  void SetConnector(const std::string&,const std::string&)const;
   bool Initialize();
   bool ProcessThisEvent();
   bool Finalize();
 
 private:    // for all
+  std::string GetConnector(const std::string&)const;
   bool ReadDataIntoDataBuffer();    // read one e2250813
   /* 
    *    1. return true:
@@ -100,7 +100,6 @@ private:    // for all
   std::map<long,_FeeData*>      fNudBuf;
 
 private:
-  DmpMetadata       *fMetadata;     // metadata of simulation
   DmpEvtHeader      *fEvtHeader;    // save me
   bool ProcessThisEventHeader(const long &id);    // convert event header
   bool ProcessThisEventTrigger(const long &id);

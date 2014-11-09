@@ -12,15 +12,12 @@
 
 //-------------------------------------------------------------------
 DmpAlgHex2Root::DmpAlgHex2Root()
- :DmpVAlg("Rdc/Hex2Root/EQM"),fGoodRawEventID(0),fEvtHeader(0),fMetadata(0),
+ :DmpVAlg("Rdc/Hex2Root/EQM"),fGoodRawEventID(0),fEvtHeader(0),
   fEvtBgo(0),fEvtPsd(0),fEvtNud(0),fEvtStk(0)
 {
-  fMetadata = new DmpMetadata();
-  gDataBuffer->RegisterObject("Metadata/Rdc/JobOpt",fMetadata,"DmpMetadata");
-  std::string prefix = (std::string)getenv("DMPSWSYS")+"/share/Connector/";
-  fMetadata->SetOption("Bgo/Connector",prefix+"Bgo/EQM");
-  fMetadata->SetOption("Psd/Connector",prefix+"Psd/EQM");
-  fMetadata->SetOption("Stk/Connector",prefix+"Stk/EQM");
+  std::string prefix = (std::string)getenv("DMPSWSYS")+"/share/Connector";
+  this->SetConnector("Bgo",prefix+"/Bgo/EQM");
+  this->SetConnector("Psd",prefix+"/Psd/EQM");
   //gRootIOSvc->Set("Output/Key","rdc");
 }
 
@@ -29,8 +26,13 @@ DmpAlgHex2Root::~DmpAlgHex2Root(){
 }
 
 //-------------------------------------------------------------------
-void DmpAlgHex2Root::Set(const std::string &type, const std::string &argv){
-  fMetadata->SetOption(type,argv);
+void DmpAlgHex2Root::SetConnector(const std::string &type, const std::string &argv)const{
+  gRootIOSvc->JobOptionLogger()->SetOption(this->Name()+"/Connector/"+type,argv);
+}
+
+//-------------------------------------------------------------------
+std::string DmpAlgHex2Root::GetConnector(const std::string &v)const{
+  return gRootIOSvc->JobOptionLogger()->GetValue(this->Name()+"/Connector/"+v);
 }
 
 //-------------------------------------------------------------------

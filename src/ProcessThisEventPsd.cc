@@ -7,6 +7,7 @@
 #include "DmpDataBuffer.h"
 #include "DmpAlgHex2Root.h"
 #include "DmpPsdBase.h"
+#include "DmpCore.h"
 
 //-------------------------------------------------------------------
 #include <boost/filesystem/path.hpp>
@@ -16,7 +17,7 @@ bool DmpAlgHex2Root::InitializePsd(){
   // setup connector
   short feeID=0, channelNo=0, channelID=0, layerID=0, stripID=0, sideID=0, dyID=0;
   boost::filesystem::directory_iterator end_iter;
-  for(boost::filesystem::directory_iterator iter(fMetadata->GetValue("Psd/Connector"));iter!=end_iter;++iter){
+  for(boost::filesystem::directory_iterator iter(this->GetConnector("Psd"));iter!=end_iter;++iter){
     if(iter->path().extension() != ".cnct") continue;
     ifstream cnctFile(iter->path().string().c_str());
     if(not cnctFile.good()){
@@ -46,10 +47,10 @@ bool DmpAlgHex2Root::InitializePsd(){
 //-------------------------------------------------------------------
 bool DmpAlgHex2Root::ProcessThisEventPsd(const long &id){
   if(fPsdBuf.find(id) == fPsdBuf.end()){
-  std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<") not find "<<id<<std::endl;
+    DmpLogError<<" (Psd) not find event "<<id<<DmpLogEndl;
     return false;
   }
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
+  DmpLogDebug<<DmpLogEndl;
   fEvtPsd->Reset();
   short nFee = fPsdBuf[id].size();
   for(short i=0;i<nFee;++i){
@@ -103,7 +104,7 @@ std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
     fEvtHeader->SetTag(DmpEDetectorID::kPsd,DmpEvtHeader::tag_TrigNotMatchTrigSys);
     DmpLogWarning<<"Psd trigger not match trigger system.\t Psd = "<<fEvtPsd->GetTrigger()<<" trigger system = "<<fEvtHeader->GetTrigger();PrintTime();
   }
-std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")"<<std::endl;
+  DmpLogDebug<<DmpLogEndl;
   return true;
 }
 
