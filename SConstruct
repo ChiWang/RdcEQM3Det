@@ -18,7 +18,7 @@ print "---> compiling: %s\n" % target
 # environment
 env = Environment(ENV = os.environ)
 env.ParseConfig("dmpsw-config --include --libs")
-env.ParseConfig("python-config --include --libs")  # 2 lines for binding
+env.ParseConfig("python-config --includes --libs")  # 2 lines for binding
 env.ParseConfig("root-config --cflags --libs")
 #env.ParseConfig("clhep-config --include --libs")
 #env.PrependENVPath('PATH', os.environ['G4INSTALL']+'/../../../bin')    # 2 lines for G4
