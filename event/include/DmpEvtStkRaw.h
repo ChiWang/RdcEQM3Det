@@ -1,7 +1,6 @@
 #ifndef DmpEvtStkRaw_H
 #define DmpEvtStkRaw_H
 
-#include <map>
 #include "DmpFeeNavig.h"
 
 //-------------------------------------------------------------------
@@ -27,7 +26,7 @@ public:
 
 public:
   std::vector<DmpFeeNavig>  fFeeNavig;
-  std::map<short,double>    fADC;      // key is global dynode ID, value is adc count
+  std::vector<long,double>    fADC;      // key is global dynode ID, value is adc count
 
   ClassDef(DmpEvtStkRaw,1)
 };

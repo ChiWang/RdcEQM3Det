@@ -117,7 +117,7 @@ bool DmpAlgHex2Root::ProcessThisEventTrigger(const long &id){
   }
   // generated and enabled
   unsigned short choosing;
-  choosing = ((unsigned short)(unsigned char)(fTriggerBuf[id]->Data[0]))<<8 + (fTriggerBuf[id]->Data[1] & 0x00c0) + (fTriggerBuf[id]->Data[1]&0x0003)<<4 + (fTriggerBuf[id]->Data[2]>>4 & 0x0008) + (fTriggerBuf[id]->Data[3]>>5 &0x0004);
+  choosing = ((unsigned short)(unsigned char)(fTriggerBuf[id]->Data[0]))<<8 + ((unsigned char)(fTriggerBuf[id]->Data[1]) & 0x00c0) + (((unsigned char)fTriggerBuf[id]->Data[1])&0x0003)<<4 + (((unsigned char)fTriggerBuf[id]->Data[2])>>4 & 0x0008) + (((unsigned char)fTriggerBuf[id]->Data[3])>>5 &0x0004);
   choosing =  (choosing>>2 & 0x3fff);
   fEvtHeader->SetTriggerChoose(choosing);
   unsigned char generate,enable;
