@@ -2,6 +2,7 @@
 #define DmpEvtStkRaw_H
 
 #include "DmpFeeNavig.h"
+#include <map>
 
 //-------------------------------------------------------------------
 class DmpEvtStkRaw : public TObject{
@@ -26,7 +27,7 @@ public:
 
 public:
   std::vector<DmpFeeNavig>  fFeeNavig;
-  std::vector<long,double>    fADC;      // key is global dynode ID, value is adc count
+  std::map<long,double>    fADC;      // key is global dynode ID, value is adc count
 
   ClassDef(DmpEvtStkRaw,1)
 };
