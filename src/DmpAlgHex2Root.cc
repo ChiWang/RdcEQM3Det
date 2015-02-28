@@ -27,12 +27,12 @@ DmpAlgHex2Root::~DmpAlgHex2Root(){
 
 //-------------------------------------------------------------------
 void DmpAlgHex2Root::SetConnector(const std::string &type, const std::string &argv)const{
-  gRootIOSvc->JobOptionLogger()->SetOption(this->Name()+"/Connector/"+type,argv);
+  gRootIOSvc->JobOption()->SetOption(this->Name()+"/Connector/"+type,argv);
 }
 
 //-------------------------------------------------------------------
 std::string DmpAlgHex2Root::GetConnector(const std::string &v)const{
-  return gRootIOSvc->JobOptionLogger()->GetValue(this->Name()+"/Connector/"+v);
+  return gRootIOSvc->JobOption()->GetValue(this->Name()+"/Connector/"+v);
 }
 
 //-------------------------------------------------------------------
@@ -46,7 +46,7 @@ bool DmpAlgHex2Root::Initialize(){
     fOutError.open(name.c_str(),std::ios::out|std::ios::binary);
   }
   fEvtHeader = new DmpEvtHeader();
-  gDataBuffer->RegisterObject("Event/Rdc/EventHeader",fEvtHeader,"DmpEvtHeader");
+  gDataBuffer->RegisterObject("Event/Rdc/EventHeader",fEvtHeader);
   bool psd = InitializePsd();
   bool stk = InitializeStk();
   bool bgo = InitializeBgo();

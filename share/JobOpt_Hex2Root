@@ -15,7 +15,7 @@ import libDmpHex2Root as Hex2Root
 
 #-------------------------------------------------------------------
 # Global setting
-#DMPSW.Core.MaxEventNumber("4")     #  default: -1 
+DMPSW.Core.SetEventNumber(3)     #  default: -1
 #DMPSW.Core.StartTime("2013-01-01 00:00:00")     # default: 2013-01-01 00:00:00
 #DMPSW.Core.StopTime("2016-01-01 00:00:00")      # default: 2053-01-01 00:00:00
 #DMPSW.Core.LogLevel("Debug")      # Value = {Error | Warning | Info | Debug}. default: Info
@@ -23,10 +23,10 @@ import libDmpHex2Root as Hex2Root
 
 #-------------------------------------------------------------------
 # RootIOSvc Service
-DMPSW.RootIOSvc.InputPath(os.environ["DMPSWWORK"]+"/run/BT/sci")
-DMPSW.RootIOSvc.InputFile("A2_20141024_181906.frd")
-#DMPSW.RootIOSvc.OutputPath(os.environ["DMPSWWORK"]+"/run/BT/raw")
-DMPSW.RootIOSvc.WriteList("Event/Rdc")  # split by ;
+#DMPSW.RootIOSvc.SetInputPath(os.environ["DMPSWWORK"]+"/run/BT/sci")
+DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141117_135210.frd")
+#DMPSW.RootIOSvc.SetOutputPath(os.environ["DMPSWWORK"]+"/run/BT/raw")
+DMPSW.RootIOSvc.SetWriteList("Event/Rdc")  # split by ;
 
 #-------------------------------------------------------------------
 # Creat user's service or algorithm

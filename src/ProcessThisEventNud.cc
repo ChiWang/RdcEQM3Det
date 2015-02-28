@@ -14,7 +14,7 @@
 bool DmpAlgHex2Root::InitializeNud(){
   DmpLogInfo<<"Initialize \tNud"<<DmpLogEndl;
   fEvtNud = new DmpEvtNudRaw();
-  gDataBuffer->RegisterObject("Event/Rdc/Nud",fEvtNud,"DmpEvtNudRaw");
+  gDataBuffer->RegisterObject("Event/Rdc/Nud",fEvtNud);
   return true;
 }
 

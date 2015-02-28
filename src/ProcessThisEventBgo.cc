@@ -35,13 +35,14 @@ bool DmpAlgHex2Root::InitializeBgo(){
       cnctFile>>barID;
       cnctFile>>sideID;
       cnctFile>>dyID;
+      //std::cout<<"DEBUG: "<<__FILE__<<"("<<__LINE__<<")Fee = "<<feeID<<"\tc = "<<channelID<<"\t\t"<<layerID<<"\t"<<barID<<"\t"<<sideID<<"\t"<<dyID<<std::endl;
       fMapBgo.insert(std::make_pair(feeID*1000+channelID,DmpBgoBase::ConstructGlobalDynodeID(layerID,barID,sideID,dyID)));
     }
     cnctFile.close();
   }
   //-------------------------------------------------------------------
   fEvtBgo = new DmpEvtBgoRaw();
-  gDataBuffer->RegisterObject("Event/Rdc/Bgo",fEvtBgo,"DmpEvtBgoRaw");
+  gDataBuffer->RegisterObject("Event/Rdc/Bgo",fEvtBgo);
   return true;
 }
 

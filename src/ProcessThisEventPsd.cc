@@ -40,7 +40,7 @@ bool DmpAlgHex2Root::InitializePsd(){
   }
   //-------------------------------------------------------------------
   fEvtPsd = new DmpEvtPsdRaw();
-  gDataBuffer->RegisterObject("Event/Rdc/Psd",fEvtPsd,"DmpEvtPsdRaw");
+  gDataBuffer->RegisterObject("Event/Rdc/Psd",fEvtPsd);
   return true;
 }
 
