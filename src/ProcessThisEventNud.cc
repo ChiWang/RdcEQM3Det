@@ -29,8 +29,8 @@ bool DmpAlgHex2Root::ProcessThisEventNud(const long &id){
   fEvtNud->fFeeNavig = fNudBuf[id]->Navigator;
   for(size_t c=0;c<4;++c){        // 4 channels of Nud
     short v = (short)((fNudBuf[id]->Signal[2*c]<<8) | (fNudBuf[id]->Signal[2*c+1]&0x00ff));
-    fEvtNud->fChannelID[c] = c;
-    fEvtNud->fADC[c] =v;
+    fEvtNud->fChannelID.push_back(c);
+    fEvtNud->fADC.push_back(v);
   }
     // flag check
     short feeID = fEvtNud->fFeeNavig.GetFeeID();
