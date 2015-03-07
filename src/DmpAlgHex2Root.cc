@@ -12,13 +12,10 @@
 
 //-------------------------------------------------------------------
 DmpAlgHex2Root::DmpAlgHex2Root()
- :DmpVAlg("Rdc/Hex2Root/EQM"),fGoodRawEventID(0),fEvtHeader(0),
-  fEvtBgo(0),fEvtPsd(0),fEvtNud(0),fEvtStk(0)
+ :DmpVAlg("DmpAlgHex2Root"),fCurrentEventID(0),fEvtHeader(0),
+  fEvtBgo(0),fEvtPsd(0),fEvtNud(0),fEvtStk(0),fMode("FM")
 {
-  std::string prefix = (std::string)getenv("DMPSWSYS")+"/share/Connector";
-  this->SetConnector("Bgo",prefix+"/Bgo/EQM");
-  this->SetConnector("Psd",prefix+"/Psd/EQM");
-  //gRootIOSvc->Set("Output/Key","rdc");
+  gRootIOSvc->SetOutFileKey("Rdc");
 }
 
 //-------------------------------------------------------------------
@@ -27,16 +24,19 @@ DmpAlgHex2Root::~DmpAlgHex2Root(){
 
 //-------------------------------------------------------------------
 void DmpAlgHex2Root::SetConnector(const std::string &type, const std::string &argv)const{
-  gRootIOSvc->JobOption()->SetOption(this->Name()+"/Connector/"+type,argv);
+  gCore->GetJobOption()->SetOption(this->Name()+"/Connector/"+type,argv);
 }
 
 //-------------------------------------------------------------------
 std::string DmpAlgHex2Root::GetConnector(const std::string &v)const{
-  return gRootIOSvc->JobOption()->GetValue(this->Name()+"/Connector/"+v);
+  return gCore->GetJobOption()->GetValue(this->Name()+"/Connector/"+v);
 }
 
 //-------------------------------------------------------------------
 bool DmpAlgHex2Root::Initialize(){
+  std::string prefix = (std::string)getenv("DMPSWSYS")+"/share/Connector";
+  this->SetConnector("Bgo",prefix+"/Bgo/"+fMode);
+  this->SetConnector("Psd",prefix+"/Psd/"+fMode);
   fFile.open(gRootIOSvc->GetInputFileName().c_str(),std::ios::in|std::ios::binary);
   if(not fFile.good()){
     DmpLogError<<"Open "<<gRootIOSvc->GetInputFileName()<<" failed"<<DmpLogEndl;
@@ -59,6 +59,7 @@ bool DmpAlgHex2Root::ProcessThisEvent(){
 // *
 // *  TODO: 
 // *
+  fCurrentEventID = gRootIOSvc->GetOutputEventID(); // must before readdata
   while(fEventInBuf.size() == 0){
     if(fFile.eof() || (fFile.tellg() == -1)){
       DmpLogInfo<<"Reach the end of "<<gRootIOSvc->GetInputFileName()<<DmpLogEndl;
@@ -67,13 +68,12 @@ bool DmpAlgHex2Root::ProcessThisEvent(){
     }
     ReadDataIntoDataBuffer();
   }
-  long eventID = gCore->GetCurrentEventID();
-  bool header = ProcessThisEventHeader(eventID);
-  bool bgo = ProcessThisEventBgo(eventID);
-  bool psd = ProcessThisEventPsd(eventID);
-  bool nud = ProcessThisEventNud(eventID);
-  bool stk = ProcessThisEventStk(eventID);
-  EraseBuffer(eventID);
+  bool header = ProcessThisEventHeader(fCurrentEventID);
+  bool bgo = ProcessThisEventBgo(fCurrentEventID);
+  bool psd = ProcessThisEventPsd(fCurrentEventID);
+  bool nud = ProcessThisEventNud(fCurrentEventID);
+  bool stk = ProcessThisEventStk(fCurrentEventID);
+  EraseBuffer(fCurrentEventID);
   return (header && bgo && psd && nud && stk);
 }
 

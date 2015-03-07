@@ -15,6 +15,7 @@ BOOST_PYTHON_MODULE(libDmpHex2Root){
   // default algorithm
   class_<DmpAlgHex2Root,boost::noncopyable,bases<DmpVAlg> >("DmpAlgHex2Root",init<>())
     .def("SetConnector",&DmpAlgHex2Root::SetConnector)
+    .def("SetMode",&DmpAlgHex2Root::SetMode)
   ;
   //class_<DmpAlgHex2Root,boost::noncopyable,bases<DmpVAlg> >("DmpAlgHex2Root",init<>());
 }

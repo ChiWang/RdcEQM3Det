@@ -69,12 +69,14 @@ public:
   ~DmpAlgHex2Root();
 
   void SetConnector(const std::string&,const std::string&)const;
+  void SetMode(std::string m){fMode = m;}
   bool Initialize();
   bool ProcessThisEvent();
   bool Finalize();
 
 private:    // for all
   std::string GetConnector(const std::string&)const;
+  std::string GetMode()const{return fMode;}
   bool ReadDataIntoDataBuffer();    // read one e2250813
   /* 
    *    1. return true:
@@ -88,7 +90,7 @@ private:    // for all
   void Exception(const int &b,const std::string &e);     // throw whole data of e2250813 into fOutError
   void EraseBuffer(const long &id);
 
-  long              fGoodRawEventID;    // good event id, find from raw data(one e2250813 or many e2250813)
+  long              fCurrentEventID;    // good event id, from gCore
   std::ifstream     fFile;          // in data stream
   std::ofstream     fOutError;      // save error datas into Error_fInDataName
   std::vector<long> fEventInBuf;    // Event ID: Event in Buffer
@@ -98,6 +100,7 @@ private:    // for all
   std::map<long,std::vector<_FeeData*> >    fPsdBuf;
   std::map<long,std::vector<_FeeData*> >    fStkBuf;
   std::map<long,_FeeData*>      fNudBuf;
+  std::string           fMode;          // Mode = {EM | EQM | FM}   // defalut is FM
 
 private:
   DmpEvtHeader      *fEvtHeader;    // save me

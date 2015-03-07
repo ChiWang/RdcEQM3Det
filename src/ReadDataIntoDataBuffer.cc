@@ -7,6 +7,7 @@
 #include "DmpAlgHex2Root.h"
 #include "DmpEDetectorID.h"
 #include "DmpCore.h"
+#include "DmpRootIOSvc.h"
 
 bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
   static short s_LastPkgID = -1;
@@ -32,7 +33,7 @@ bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
     return false;
   }
   _HeaderNavig *newEvt = new _HeaderNavig(dataLength,&time[2]);
-  fHeaderBuf.insert(std::make_pair(fGoodRawEventID,newEvt));
+  fHeaderBuf.insert(std::make_pair(fCurrentEventID,newEvt));
   if((s_LastPkgID != -1) && (((packetID-1)&s_LastPkgID) != s_LastPkgID)){
     DmpLogWarning<<"Scientific data package count not continuous...\tLast/Current: "<<s_LastPkgID<<"/"<<packetID;  PrintTime();
   }
@@ -51,7 +52,7 @@ bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
           char data[dataLength];
           fFile.read(data,dataLength);
           _TriggerData *newTrig = new _TriggerData(data,dataLength);
-          fTriggerBuf[fGoodRawEventID] = newTrig;
+          fTriggerBuf[fCurrentEventID] = newTrig;
         }else{
           fFile.read((char*)(&dataLength),2);
           dataLength= htobe16(dataLength);
@@ -64,13 +65,13 @@ bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
             //DmpLogInfo<<"Fee ID 0x"<<std::hex<<newFee->Navigator.FeeID<<", Mode "<<newFee->Navigator.RunMode<<std::dec<<DmpLogEndl;
             DmpEDetectorID::Type detID = newFee->Navigator.GetDetectorID();
             if(DmpEDetectorID::kBgo == detID){
-              fBgoBuf[fGoodRawEventID].push_back(newFee);
+              fBgoBuf[fCurrentEventID].push_back(newFee);
             }else if(DmpEDetectorID::kPsd == detID){
-              fPsdBuf[fGoodRawEventID].push_back(newFee);
+              fPsdBuf[fCurrentEventID].push_back(newFee);
             }else if(DmpEDetectorID::kNud == detID){
-              fNudBuf[fGoodRawEventID] = newFee;
+              fNudBuf[fCurrentEventID] = newFee;
             }else if(DmpEDetectorID::kStk == detID){
-              fStkBuf[fGoodRawEventID].push_back(newFee);
+              fStkBuf[fCurrentEventID].push_back(newFee);
             }else{
               Exception(endOfLastHeader,"Fee type error");
               return false;
@@ -93,8 +94,7 @@ bool DmpAlgHex2Root::ReadDataIntoDataBuffer(){
     return false;
   }
   // check buffer, has current event? TODO: for Stk?
-  fEventInBuf.push_back(fGoodRawEventID);
-  ++fGoodRawEventID;
+  fEventInBuf.push_back(fCurrentEventID);
   return true;
 }
 
@@ -126,7 +126,7 @@ bool DmpAlgHex2Root::CheckEb90DataLength(const int &n){
 
 //-------------------------------------------------------------------
 void DmpAlgHex2Root::Exception(const int &endOfLastE2250813,const std::string &e){
-  DmpLogError<<e<<"\tEvent ID: "<<gCore->GetCurrentEventID(); PrintTime();
+  DmpLogError<<e<<"\tEvent ID: Reading= "<<gCore->GetInTimeEventID()<<"\tWriting = "<<gRootIOSvc->GetOutputEventID(); PrintTime();
   fFile.seekg(endOfLastE2250813,std::ios::beg);
   unsigned int scientificHeader = 0;         // 4 bytes 0xe225 0813
   fFile.read((char*)(&scientificHeader),4);
@@ -143,7 +143,7 @@ void DmpAlgHex2Root::Exception(const int &endOfLastE2250813,const std::string &e
   fFile.read(errorData,nBytes);
   fOutError.write(errorData,nBytes);
   delete[] errorData;
-  EraseBuffer(fGoodRawEventID);
+  EraseBuffer(fCurrentEventID);
   std::cout<<std::endl;
 }
 

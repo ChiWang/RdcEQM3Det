@@ -1,6 +1,6 @@
 #! /usr/bin/python
 '''
- *  $Id: JobOpt_Hex2Root, 2014-11-06 13:47:56 DAMPE $
+ *  $Id: JobOpt_Hex2Root, 2015-03-07 15:52:31 DAMPE $
  *  Author(s):
  *    Chi WANG (chiwang@mail.ustc.edu.cn) 11/03/2014
  *-----------------------------------------------------
@@ -15,7 +15,7 @@ import libDmpHex2Root as Hex2Root
 
 #-------------------------------------------------------------------
 # Global setting
-#DMPSW.Core.SetEventNumber(3)     #  default: -1
+#DMPSW.Core.SetEventNumber(200)     #  default: -1
 #DMPSW.Core.StartTime("2013-01-01 00:00:00")     # default: 2013-01-01 00:00:00
 #DMPSW.Core.StopTime("2016-01-01 00:00:00")      # default: 2053-01-01 00:00:00
 #DMPSW.Core.LogLevel("Debug")      # Value = {Error | Warning | Info | Debug}. default: Info
@@ -24,15 +24,17 @@ import libDmpHex2Root as Hex2Root
 #-------------------------------------------------------------------
 # RootIOSvc Service
 #DMPSW.RootIOSvc.SetInputPath(os.environ["DMPSWWORK"]+"/run/BT/sci")
-DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141117_135210.frd")
-#DMPSW.RootIOSvc.SetOutputPath(os.environ["DMPSWWORK"]+"/run/BT/raw")
+DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141118_214521.frd")
+#DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141117_135210.frd")
+DMPSW.RootIOSvc.SetOutputFile("tesx.root")
 DMPSW.RootIOSvc.SetWriteList("Event/Rdc")  # split by ;
 
 #-------------------------------------------------------------------
 # Creat user's service or algorithm
 rdcAlgBT = Hex2Root.DmpAlgHex2Root()
-rdcAlgBT.SetConnector("Psd",DMPSW.WorkPath+"/share/Connector/Psd/EQM")
-rdcAlgBT.SetConnector("Bgo",DMPSW.WorkPath+"/share/Connector/Bgo/EQM")
+rdcAlgBT.SetMode("EQM")
+#rdcAlgBT.SetConnector("Psd",DMPSW.WorkPath+"/share/Connector/Psd/EQM")
+#rdcAlgBT.SetConnector("Bgo",DMPSW.WorkPath+"/share/Connector/Bgo/EQM")
 
 #-------------------------------------------------------------------
 # Append user's service or algorithm into Kernel
