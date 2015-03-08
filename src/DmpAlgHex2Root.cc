@@ -45,8 +45,8 @@ bool DmpAlgHex2Root::Initialize(){
     std::string name = gRootIOSvc->GetOutputPath()+gRootIOSvc->GetInputStem()+".error";
     fOutError.open(name.c_str(),std::ios::out|std::ios::binary);
   }
-  fEvtHeader = new DmpEvtHeader();
-  gDataBuffer->RegisterObject("Event/Rdc/EventHeader",fEvtHeader);
+  fEvtHeader = gCore->EventHeader();
+  //gDataBuffer->RegisterObject("Event/Header/Rdc",fEvtHeader);
   bool psd = InitializePsd();
   bool stk = InitializeStk();
   bool bgo = InitializeBgo();
