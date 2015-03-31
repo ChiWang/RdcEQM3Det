@@ -27,8 +27,8 @@ import libDmpHex2Root as Hex2Root
 #-------------------------------------------------------------------
 # RootIOSvc Service
 #DMPSW.RootIOSvc.SetInputPath(os.environ["DMPSWWORK"]+"/run/BT/sci")
-#DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141118_214521.frd")
-DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141117_135210.frd")
+DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141118_214521.frd")
+#DMPSW.RootIOSvc.SetInputFile("./A2Data00_20141117_135210.frd")
 #DMPSW.RootIOSvc.SetOutputFile("ztesx.root")
 DMPSW.RootIOSvc.SetWriteList("Event/Rdc")  # split by ;
 
